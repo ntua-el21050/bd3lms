@@ -326,20 +326,25 @@ def get_dataset(
   _path = os.path.join(cache_dir, filename)
   
   if utils.fsspec_exists(_path):
-    LOGGER.info(f'Loading data from: {_path}')
+    print(f'Loading data from: {_path}')
     dataset = datasets.load_from_disk(_path)
     # Limit cached dataset if max_samples specified
     if max_samples is not None:
-      LOGGER.info(f'Limiting cached dataset to {max_samples} samples')
+      print(f'Limiting cached dataset to {max_samples} samples')
       dataset = dataset.select(range(min(max_samples, len(dataset))))
     return dataset.with_format('torch')
-  LOGGER.info(f'Generating new data at: {_path}')
-  LOGGER.info(f'{streaming=}')  
+  print(f'Generating new data at: {_path}')
+  print(f'{streaming=}')  
 
   crop_train = dataset_name == 'text8-crop'
   if mode == 'train' and crop_train:
     # double block size for sub-sampling
     block_size *= 2
+  
+  # Build split string with max_samples limit
+  split_suffix = ''
+  if max_samples is not None and not streaming:
+    split_suffix = f'[:{max_samples}]'
   
   if dataset_name == 'wikitext103':
     dataset = datasets.load_dataset(
@@ -370,58 +375,73 @@ def get_dataset(
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size, crop_train=True)
   elif dataset_name == 'openwebtext-train':
+    split = f'train[:-100000]{split_suffix}'
+    print(f'Loading openwebtext with split: {split}')
     dataset = datasets.load_dataset(
       'openwebtext',
-      split='train[:-100000]',
+      split=split,
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
       trust_remote_code=True)
   elif dataset_name == 'openwebtext-valid':
+    split = f'train[-100000:]{split_suffix}'
+    print(f'Loading openwebtext with split: {split}')
     dataset = datasets.load_dataset(
       'openwebtext',
-      split='train[-100000:]',
+      split=split,
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
       trust_remote_code=True)
   elif dataset_name == 'scientific_papers_arxiv':
+    split = f'{mode}{split_suffix}'
+    print(f'Loading scientific_papers_arxiv with split: {split}')
     dataset = datasets.load_dataset(
       'scientific_papers', 'arxiv',
       trust_remote_code=True,
       cache_dir=cache_dir,
       streaming=streaming,
-      revision=revision)
+      revision=revision,
+      split=split if split_suffix else None)
   elif dataset_name == 'scientific_papers_pubmed':
+    split = f'{mode}{split_suffix}'
+    print(f'Loading scientific_papers_pubmed with split: {split}')
     dataset = datasets.load_dataset(
       'scientific_papers', 'pubmed',
       trust_remote_code=True,
       cache_dir=cache_dir,
       streaming=streaming,
-      revision=revision)
+      revision=revision,
+      split=split if split_suffix else None)
   elif dataset_name == 'ag_news':
+    split = f'{mode}{split_suffix}'
+    print(f'Loading ag_news with split: {split}')
     dataset = datasets.load_dataset(
       'ag_news',
       cache_dir=cache_dir,
       streaming=streaming,
-      revision=revision)
+      revision=revision,
+      split=split if split_suffix else None)
   else:
+    split = f'{mode}{split_suffix}' if not isinstance(dataset_name, str) or dataset_name not in ['lambada', 'openwebtext-train', 'openwebtext-valid'] else mode
     dataset = datasets.load_dataset(
       dataset_name,
       cache_dir=cache_dir,
       streaming=streaming,
       trust_remote_code=True,
-      revision=revision)
+      revision=revision,
+      split=split if split_suffix else None)
 
   if dataset_name in ['lambada', 'openwebtext-train',
                       'openwebtext-valid']:
     data = dataset
   else:
-    data = dataset[mode]
+    data = dataset[mode] if not (max_samples is not None and not streaming) else dataset
 
   # Limit dataset size IMMEDIATELY after loading, before any processing
   if max_samples is not None and not streaming:
-    LOGGER.info(f'Limiting dataset to {max_samples} samples (before processing)')
+    print(f'Limiting dataset to {max_samples} samples (before processing)')
     if isinstance(data, datasets.DatasetDict):
       data = {k: v.select(range(min(max_samples, len(v)))) for k, v in data.items()}
     else:
