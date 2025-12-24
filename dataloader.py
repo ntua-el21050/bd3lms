@@ -17,6 +17,7 @@ import tokenizers
 import torch
 import transformers
 import numpy as np
+import os as _os  # small alias for env reads
 
 import utils
 
@@ -600,13 +601,13 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("train_revision", None))
-  # optional subsample for faster/debug runs (config.data.max_train_samples or config.data.train_fraction)
+  # optional subsample for faster/debug runs:
+  # precedence: environment vars (BD3LM_...) -> config.data attributes (if present)
   train_set = _subsample_dataset(
     train_set,
-    max_samples=getattr(config.data, 'max_train_samples', None),
-    fraction=getattr(config.data, 'train_fraction', None),
-    seed=getattr(config.data, 'seed', None))
-  
+    max_samples=_env_or_config_int('BD3LM_MAX_TRAIN_SAMPLES', config.data, 'max_train_samples'),
+    fraction=_env_or_config_float('BD3LM_TRAIN_FRACTION', config.data, 'train_fraction'),
+    seed=_env_or_config_int('BD3LM_SEED', config.data, 'seed'))
   if config.data.valid in ['text8', 'lm1b', 'ag_news']:
     validation_split = 'test'
   else:
@@ -625,18 +626,17 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("valid_revision", None))
-  # optional subsample for validation (config.data.max_valid_samples or config.data.valid_fraction)
+  # optional subsample for validation (env fallback -> config)
   valid_set = _subsample_dataset(
     valid_set,
-    max_samples=getattr(config.data, 'max_valid_samples', None),
-    fraction=getattr(config.data, 'valid_fraction', None),
-    seed=getattr(config.data, 'seed', None))
-  
+    max_samples=_env_or_config_int('BD3LM_MAX_VALID_SAMPLES', config.data, 'max_valid_samples'),
+    fraction=_env_or_config_float('BD3LM_VALID_FRACTION', config.data, 'valid_fraction'),
+    seed=_env_or_config_int('BD3LM_SEED', config.data, 'seed'))
+
   if skip_train:
     train_loader = None
   else:
-    # allow override of num_workers for low-resource environments (e.g., Kaggle)
-    num_workers_train = getattr(config.loader, 'num_workers_kaggle', config.loader.num_workers)
+    num_workers_train = _env_or_config_int('BD3LM_NUM_WORKERS_KAGGLE', config.loader, 'num_workers_kaggle') or getattr(config.loader, 'num_workers', 0)
     train_loader = torch.utils.data.DataLoader(
       train_set,
       batch_size=config.loader.batch_size,
@@ -645,16 +645,17 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       shuffle=not config.data.streaming,
       persistent_workers=True)
     train_loader.tokenizer = tokenizer
-    if skip_valid:
-     valid_loader = None
+
+  if skip_valid:
+    valid_loader = None
+  else:
+    if valid_seed is None:
+      shuffle_valid = False
+      generator = None
     else:
-     if valid_seed is None:
-       shuffle_valid = False
-       generator = None
-     else:
-       shuffle_valid = True
-       generator = torch.Generator().manual_seed(valid_seed)
-    num_workers_eval = getattr(config.loader, 'num_workers_kaggle', config.loader.num_workers)
+      shuffle_valid = True
+      generator = torch.Generator().manual_seed(valid_seed)
+    num_workers_eval = _env_or_config_int('BD3LM_NUM_WORKERS_KAGGLE', config.loader, 'num_workers_kaggle') or getattr(config.loader, 'num_workers', 0)
     valid_loader = torch.utils.data.DataLoader(
       valid_set,
       batch_size=config.loader.eval_batch_size,
@@ -662,11 +663,9 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       pin_memory=getattr(config.loader, 'pin_memory', False),
       shuffle=shuffle_valid,
       generator=generator)
-     # Will be used in generative perplexity calculation
     valid_loader.tokenizer = tokenizer
 
   return train_loader, valid_loader
-
 
 # Samplers adapted from: https://github.com/Dao-AILab/flash-attention/blob/main/training/src/datamodules/fault_tolerant_sampler.py
 
@@ -674,10 +673,6 @@ def get_dataloaders(config, tokenizer, skip_train=False,
 class RandomFaultTolerantSampler(torch.utils.data.RandomSampler):
 
   def __init__(self, *args, generator=None, **kwargs):
-    # TD [2022-07-17]: We don't force the seed to be zero. We generate random seed,
-    # which should be reproducible if pl.seed_everything was called beforehand.
-    # This means that changing the seed of the experiment will also change the
-    # sampling order.
     if generator is None:
       seed = int(torch.empty((), dtype=torch.int64).random_().item())
       generator = torch.Generator().manual_seed(seed)
@@ -693,28 +688,20 @@ class RandomFaultTolerantSampler(torch.utils.data.RandomSampler):
   def load_state_dict(self, state_dict):
     self.generator.set_state(state_dict.get('random_state'))
     self.counter = state_dict['counter']
-    # self.start_counter = self.counter
     self.restarting = True
-
-  # TD [2022-08-28] Setting the len will cause PL to think there are only a few batches left per
-  # epoch, and subsequent epoch will have very few batches.
 
   def __iter__(self) -> typing.Iterator[int]:
     n = len(self.data_source)
-
     self.state = self.generator.get_state()
     indices = torch.randperm(n, generator=self.generator).tolist()
-
     if not self.restarting:
       self.counter = 0
     else:
       indices = indices[self.counter:]
       self.restarting = False
-
     for index in indices:
       self.counter += 1
       yield index
-
     self.counter = 0
 
 
@@ -733,42 +720,31 @@ class FaultTolerantDistributedSampler(torch.utils.data.DistributedSampler):
     self.counter = state_dict['counter']
     self.restarting = True
 
-  # TD [2022-08-28] Setting the len will cause PL to think there are only a few batches left per
-  # epoch, and subsequent epoch will have very few batches.
   def __iter__(self):
     if self.shuffle:
-      # deterministically shuffle based on epoch and seed
       g = torch.Generator()
       g.manual_seed(self.seed + self.epoch)
-      indices = torch.randperm(len(self.dataset), generator=g).tolist()  # type: ignore[arg-type]
+      indices = torch.randperm(len(self.dataset), generator=g).tolist()
     else:
-      indices = list(range(len(self.dataset)))  # type: ignore[arg-type]
-
+      indices = list(range(len(self.dataset)))
     if not self.drop_last:
-      # add extra samples to make it evenly divisible
       padding_size = self.total_size - len(indices)
       if padding_size <= len(indices):
         indices += indices[:padding_size]
       else:
-        indices += (indices * math.ceil(
-          padding_size / len(indices)))[:padding_size]
+        indices += (indices * math.ceil(padding_size / len(indices)))[:padding_size]
     else:
-      # remove tail of data to make it evenly divisible.
       indices = indices[:self.total_size]
     assert len(indices) == self.total_size
-
-    # subsample
     indices = indices[self.rank:self.total_size:self.num_replicas]
     assert len(indices) == self.num_samples
-
     if not self.restarting:
       self.counter = 0
     else:
       indices = indices[self.counter:]
       self.restarting = False
-
     for index in indices:
       self.counter += 1
       yield index
-
     self.counter = 0
+
