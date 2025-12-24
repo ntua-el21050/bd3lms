@@ -416,6 +416,7 @@ def get_dataset(
       streaming=streaming,
       revision=revision)
   else:
+    print(f'Loading {dataset_name} dataset (else case)')
     dataset = datasets.load_dataset(
       dataset_name,
       cache_dir=cache_dir,
