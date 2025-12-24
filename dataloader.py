@@ -329,7 +329,22 @@ def get_dataset(
   
   if utils.fsspec_exists(_path):
     LOGGER.info(f'Loading data from: {_path}')
-    return datasets.load_from_disk(_path).with_format('torch')
+    loaded = datasets.load_from_disk(_path)
+    # try to apply early subsample based on env vars (mode available in scope)
+    try:
+      if mode == 'train':
+        max_samples = _env_int('BD3LM_MAX_TRAIN_SAMPLES')
+        fraction = _env_float('BD3LM_TRAIN_FRACTION')
+      else:
+        max_samples = _env_int('BD3LM_MAX_VALID_SAMPLES')
+        fraction = _env_float('BD3LM_VALID_FRACTION')
+      seed = _env_int('BD3LM_SEED') or 42
+      if (max_samples is not None) or (fraction is not None):
+        loaded = _subsample_hf_dataset(loaded, max_samples=max_samples, fraction=fraction, seed=seed)
+        LOGGER.info(f'Loaded cached {_path} and applied early subsample.')
+    except Exception:
+      LOGGER.warning('Early subsample on cached dataset failed — returning full cached dataset.')
+    return loaded.with_format('torch')
   LOGGER.info(f'Generating new data at: {_path}')
   LOGGER.info(f'{streaming=}')  
 
