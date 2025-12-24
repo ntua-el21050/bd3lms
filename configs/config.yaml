@@ -15,6 +15,9 @@ seed: 1
 
 block_size: ${model.length}
 
+data:
+  max_samples: null  # Limit dataset size (null = use full dataset)
+
 loader:
   global_batch_size: 512
   eval_global_batch_size: ${.global_batch_size}
