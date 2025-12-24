@@ -416,6 +416,18 @@ def get_dataset(
   else:
     data = dataset[mode]
 
+  # Early subsample raw dataset before tokenization if env vars set
+  if mode == 'train':
+    max_samples = _env_int('BD3LM_MAX_TRAIN_SAMPLES')
+    fraction = _env_float('BD3LM_TRAIN_FRACTION')
+    seed = _env_int('BD3LM_SEED') or 42
+  else:
+    max_samples = _env_int('BD3LM_MAX_VALID_SAMPLES')
+    fraction = _env_float('BD3LM_VALID_FRACTION')
+    seed = _env_int('BD3LM_SEED') or 42
+  if max_samples is not None or fraction is not None:
+    data = _subsample_hf_dataset(data, max_samples=max_samples, fraction=fraction, seed=seed)
+
   if dataset_name.startswith('wikitext'):
     detokenizer = wt_detokenizer
   elif dataset_name == 'ptb':
