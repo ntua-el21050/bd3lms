@@ -16,6 +16,7 @@ import requests
 import tokenizers
 import torch
 import transformers
+import numpy as np
 
 import utils
 
@@ -599,6 +600,12 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("train_revision", None))
+  # optional subsample for faster/debug runs (config.data.max_train_samples or config.data.train_fraction)
+  train_set = _subsample_dataset(
+    train_set,
+    max_samples=getattr(config.data, 'max_train_samples', None),
+    fraction=getattr(config.data, 'train_fraction', None),
+    seed=getattr(config.data, 'seed', None))
   
   if config.data.valid in ['text8', 'lm1b', 'ag_news']:
     validation_split = 'test'
@@ -618,35 +625,44 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("valid_revision", None))
-
+  # optional subsample for validation (config.data.max_valid_samples or config.data.valid_fraction)
+  valid_set = _subsample_dataset(
+    valid_set,
+    max_samples=getattr(config.data, 'max_valid_samples', None),
+    fraction=getattr(config.data, 'valid_fraction', None),
+    seed=getattr(config.data, 'seed', None))
+  
   if skip_train:
     train_loader = None
   else:
+    # allow override of num_workers for low-resource environments (e.g., Kaggle)
+    num_workers_train = getattr(config.loader, 'num_workers_kaggle', config.loader.num_workers)
     train_loader = torch.utils.data.DataLoader(
       train_set,
       batch_size=config.loader.batch_size,
-      num_workers=config.loader.num_workers,
-      pin_memory=config.loader.pin_memory,
+      num_workers=num_workers_train,
+      pin_memory=getattr(config.loader, 'pin_memory', False),
       shuffle=not config.data.streaming,
       persistent_workers=True)
     train_loader.tokenizer = tokenizer
-  if skip_valid:
-    valid_loader = None
-  else:
-    if valid_seed is None:
-      shuffle_valid = False
-      generator = None
+    if skip_valid:
+     valid_loader = None
     else:
-      shuffle_valid = True
-      generator = torch.Generator().manual_seed(valid_seed)
+     if valid_seed is None:
+       shuffle_valid = False
+       generator = None
+     else:
+       shuffle_valid = True
+       generator = torch.Generator().manual_seed(valid_seed)
+    num_workers_eval = getattr(config.loader, 'num_workers_kaggle', config.loader.num_workers)
     valid_loader = torch.utils.data.DataLoader(
       valid_set,
       batch_size=config.loader.eval_batch_size,
-      num_workers=config.loader.num_workers,
-      pin_memory=config.loader.pin_memory,
+      num_workers=num_workers_eval,
+      pin_memory=getattr(config.loader, 'pin_memory', False),
       shuffle=shuffle_valid,
       generator=generator)
-    # Will be used in generative perplexity calculation
+     # Will be used in generative perplexity calculation
     valid_loader.tokenizer = tokenizer
 
   return train_loader, valid_loader
