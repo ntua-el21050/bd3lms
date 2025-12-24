@@ -313,7 +313,7 @@ def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
 def get_dataset(
     dataset_name, tokenizer, wrap, mode, cache_dir,
     block_size=1024, num_proc=len(os.sched_getaffinity(0)),
-    streaming=False, revision : Optional[str]=None, insert_eos=True, insert_special_tokens=True):
+    streaming=False, revision : Optional[str]=None, insert_eos=True, insert_special_tokens=True, max_samples=None):
   eos_tag = ''
   if not insert_eos:
     eos_tag = '_eosFalse'
@@ -413,6 +413,14 @@ def get_dataset(
     data = dataset
   else:
     data = dataset[mode]
+
+  # Limit dataset size before tokenization if max_samples is specified
+  if max_samples is not None:
+    LOGGER.info(f'Limiting dataset to {max_samples} samples')
+    if isinstance(data, datasets.DatasetDict):
+      data = {k: v.select(range(min(max_samples, len(v)))) for k, v in data.items()}
+    else:
+      data = data.select(range(min(max_samples, len(data))))
 
   if dataset_name.startswith('wikitext'):
     detokenizer = wt_detokenizer
@@ -598,7 +606,8 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       cache_dir=config.data.cache_dir,
       block_size=config.model.length,
       streaming=config.data.streaming,
-      revision=config.data.get("train_revision", None))
+      revision=config.data.get("train_revision", None),
+      max_samples=config.data.get("max_samples", None))
   
   if config.data.valid in ['text8', 'lm1b', 'ag_news']:
     validation_split = 'test'
@@ -617,7 +626,8 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       cache_dir=config.data.cache_dir,
       block_size=config.model.length,
       streaming=config.data.streaming,
-      revision=config.data.get("valid_revision", None))
+      revision=config.data.get("valid_revision", None),
+      max_samples=config.data.get("max_samples", None))
 
   if skip_train:
     train_loader = None
