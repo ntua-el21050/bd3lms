@@ -434,8 +434,8 @@ def get_dataset(
     except Exception:
       print('Warning: Early subsample on cached dataset failed — returning full cached dataset.')
     return loaded.with_format('torch')
-  LOGGER.info(f'Generating new data at: {_path}')
-  LOGGER.info(f'{streaming=}')  
+  print(f'Generating new data at: {_path}')
+  print(f'streaming={streaming}')  
 
   crop_train = dataset_name == 'text8-crop'
   if mode == 'train' and crop_train:
