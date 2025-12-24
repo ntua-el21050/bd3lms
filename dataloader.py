@@ -341,33 +341,33 @@ def get_dataset(
     # double block size for sub-sampling
     block_size *= 2
   
-  # Build split string with max_samples limit
-  split_suffix = ''
-  if max_samples is not None and not streaming:
-    split_suffix = f'[:{max_samples}]'
-  
   if dataset_name == 'wikitext103':
+    print(f'Loading wikitext-103 dataset')
     dataset = datasets.load_dataset(
       'wikitext',
       name='wikitext-103-raw-v1',
       cache_dir=cache_dir,
       revision=revision)
   elif dataset_name == 'wikitext2':
+    print(f'Loading wikitext-2 dataset')
     dataset = datasets.load_dataset(
       'wikitext',
       name='wikitext-2-raw-v1',
       cache_dir=cache_dir,
       revision=revision)
   elif dataset_name == 'ptb':
+    print(f'Loading ptb dataset')
     dataset = datasets.load_dataset(
       'ptb_text_only',
       cache_dir=cache_dir,
       revision=revision)
   elif dataset_name == 'lambada':
+    print(f'Loading lambada dataset')
     dataset = get_lambada_test_dataset()
   elif dataset_name == 'text8':
     assert wrap
     assert revision is None
+    print(f'Loading text8 dataset')
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size)
   elif dataset_name == 'text8-crop':
@@ -375,77 +375,64 @@ def get_dataset(
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size, crop_train=True)
   elif dataset_name == 'openwebtext-train':
-    split = f'train[:-100000]{split_suffix}'
-    print(f'Loading openwebtext with split: {split}')
+    print(f'Loading openwebtext-train split')
     dataset = datasets.load_dataset(
       'openwebtext',
-      split=split,
+      split='train[:-100000]',
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
       trust_remote_code=True)
   elif dataset_name == 'openwebtext-valid':
-    split = f'train[-100000:]{split_suffix}'
-    print(f'Loading openwebtext with split: {split}')
+    print(f'Loading openwebtext-valid split')
     dataset = datasets.load_dataset(
       'openwebtext',
-      split=split,
+      split='train[-100000:]',
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
       trust_remote_code=True)
   elif dataset_name == 'scientific_papers_arxiv':
-    split = f'{mode}{split_suffix}'
-    print(f'Loading scientific_papers_arxiv with split: {split}')
+    print(f'Loading scientific_papers_arxiv split')
     dataset = datasets.load_dataset(
       'scientific_papers', 'arxiv',
       trust_remote_code=True,
       cache_dir=cache_dir,
       streaming=streaming,
-      revision=revision,
-      split=split if split_suffix else None)
+      revision=revision)
   elif dataset_name == 'scientific_papers_pubmed':
-    split = f'{mode}{split_suffix}'
-    print(f'Loading scientific_papers_pubmed with split: {split}')
+    print(f'Loading scientific_papers_pubmed split')
     dataset = datasets.load_dataset(
       'scientific_papers', 'pubmed',
       trust_remote_code=True,
       cache_dir=cache_dir,
       streaming=streaming,
-      revision=revision,
-      split=split if split_suffix else None)
+      revision=revision)
   elif dataset_name == 'ag_news':
-    split = f'{mode}{split_suffix}'
-    print(f'Loading ag_news with split: {split}')
+    print(f'Loading ag_news split')
     dataset = datasets.load_dataset(
       'ag_news',
       cache_dir=cache_dir,
       streaming=streaming,
-      revision=revision,
-      split=split if split_suffix else None)
+      revision=revision)
   else:
-    split = f'{mode}{split_suffix}' if not isinstance(dataset_name, str) or dataset_name not in ['lambada', 'openwebtext-train', 'openwebtext-valid'] else mode
     dataset = datasets.load_dataset(
       dataset_name,
       cache_dir=cache_dir,
       streaming=streaming,
       trust_remote_code=True,
-      revision=revision,
-      split=split if split_suffix else None)
+      revision=revision)
 
   if dataset_name in ['lambada', 'openwebtext-train',
                       'openwebtext-valid']:
     data = dataset
   else:
-    data = dataset[mode] if not (max_samples is not None and not streaming) else dataset
+    data = dataset[mode]
 
   # Limit dataset size IMMEDIATELY after loading, before any processing
   if max_samples is not None and not streaming:
-    print(f'Limiting dataset to {max_samples} samples (before processing)')
-    if isinstance(data, datasets.DatasetDict):
-      data = {k: v.select(range(min(max_samples, len(v)))) for k, v in data.items()}
-    else:
-      data = data.select(range(min(max_samples, len(data))))
+    print(f'Limiting dataset to {max_samples} samples')
+    data = data.select(range(min(max_samples, len(data))))
 
   if dataset_name.startswith('wikitext'):
     detokenizer = wt_detokenizer
