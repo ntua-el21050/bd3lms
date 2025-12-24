@@ -375,23 +375,17 @@ def get_dataset(
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size, crop_train=True)
   elif dataset_name == 'openwebtext-train':
-    print(f'Loading openwebtext-train split')
-    dataset = datasets.load_dataset(
-      'openwebtext',
-      split='train[:-100000]',
-      cache_dir=cache_dir,
-      revision=revision,
-      streaming=False,
-      trust_remote_code=True)
+    print(f'Loading openwebtext-train (custom split)')
+    data = get_openwebtext_nosplit(cache_dir, max_samples)
   elif dataset_name == 'openwebtext-valid':
-    print(f'Loading openwebtext-valid split')
-    dataset = datasets.load_dataset(
-      'openwebtext',
-      split='train[-100000:]',
-      cache_dir=cache_dir,
-      revision=revision,
-      streaming=False,
-      trust_remote_code=True)
+    print(f'Loading openwebtext-valid (custom split)')
+    full_data = get_openwebtext_nosplit(cache_dir)
+    # Use last 100k samples for validation
+    num_samples = len(full_data)
+    valid_start = max(0, num_samples - 100000)
+    data = full_data.select(range(valid_start, num_samples))
+    if max_samples is not None:
+      data = data.select(range(min(max_samples, len(data))))
   elif dataset_name == 'scientific_papers_arxiv':
     print(f'Loading scientific_papers_arxiv split')
     dataset = datasets.load_dataset(
