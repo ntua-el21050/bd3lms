@@ -336,6 +336,11 @@ def get_dataset(
     # double block size for sub-sampling
     block_size *= 2
   
+  # Prepare split string with max_samples limit
+  split_str = mode
+  if max_samples is not None and not streaming:
+    split_str = f'{mode}[:{max_samples}]'
+  
   if dataset_name == 'wikitext103':
     dataset = datasets.load_dataset(
       'wikitext',
@@ -365,17 +370,23 @@ def get_dataset(
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size, crop_train=True)
   elif dataset_name == 'openwebtext-train':
+    split = 'train[:-100000]'
+    if max_samples is not None:
+      split = f'train[:-100000][:{max_samples}]'
     dataset = datasets.load_dataset(
       'openwebtext',
-      split='train[:-100000]',
+      split=split,
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
       trust_remote_code=True)
   elif dataset_name == 'openwebtext-valid':
+    split = 'train[-100000:]'
+    if max_samples is not None:
+      split = f'train[-100000:][:{max_samples}]'
     dataset = datasets.load_dataset(
       'openwebtext',
-      split='train[-100000:]',
+      split=split,
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
@@ -607,7 +618,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("train_revision", None),
-      max_samples=config.data.get("max_samples", None))
+      max_samples=config.data.get("max_train_samples", None))
   
   if config.data.valid in ['text8', 'lm1b', 'ag_news']:
     validation_split = 'test'
@@ -627,7 +638,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("valid_revision", None),
-      max_samples=config.data.get("max_samples", None))
+      max_samples=config.data.get("max_valid_samples", None))
 
   if skip_train:
     train_loader = None

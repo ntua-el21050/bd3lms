@@ -17,6 +17,8 @@ block_size: ${model.length}
 
 data:
   max_samples: null  # Limit dataset size (null = use full dataset)
+  max_train_samples: null  # Limit training dataset size (null = use full dataset)
+  max_valid_samples: null  # Limit validation dataset size (null = use full dataset)
 
 loader:
   global_batch_size: 512
