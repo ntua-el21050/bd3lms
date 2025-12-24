@@ -312,6 +312,86 @@ def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
   return result
 
 
+def _env_int(name):
+  v = _os.getenv(name)
+  try:
+    return int(v) if v is not None else None
+  except Exception:
+    return None
+
+def _env_float(name):
+  v = _os.getenv(name)
+  try:
+    return float(v) if v is not None else None
+  except Exception:
+    return None
+
+def _subsample_hf_dataset(hf_dataset, max_samples: typing.Optional[int]=None,
+                          fraction: typing.Optional[float]=None,
+                          seed: int = 42):
+  """Subsample a HuggingFace datasets.Dataset before expensive map/tokenize."""
+  if hf_dataset is None:
+    return None
+  try:
+    n = len(hf_dataset)
+  except Exception:
+    return hf_dataset
+  if max_samples is None and fraction is None:
+    return hf_dataset
+  if fraction is not None:
+    keep = int(n * float(fraction))
+  else:
+    keep = min(int(max_samples), n)
+  if keep <= 0 or keep >= n:
+    return hf_dataset
+  rng = np.random.default_rng(seed if seed is not None else 42)
+  indices = rng.permutation(n)[:keep].tolist()
+  print(f'[_subsample_hf_dataset] Applying early subsample: keeping {keep}/{n} examples')
+  return hf_dataset.select(indices)
+
+def _subsample_dataset(dataset, max_samples: typing.Optional[int]=None,
+                       fraction: typing.Optional[float]=None,
+                       seed: typing.Optional[int]=42):
+  """Return a torch.utils.data.Subset of dataset according to max_samples or fraction."""
+  if dataset is None:
+    return None
+  if max_samples is None and fraction is None:
+    return dataset
+  try:
+    n = len(dataset)
+  except Exception:
+    return dataset
+  if fraction is not None:
+    keep = int(n * float(fraction))
+  elif max_samples is not None:
+    keep = min(int(max_samples), n)
+  else:
+    return dataset
+  if keep <= 0:
+    return dataset
+  rng = np.random.default_rng(seed if seed is not None else 42)
+  indices = rng.permutation(n)[:keep].tolist()
+  return torch.utils.data.Subset(dataset, indices)
+
+def _env_or_config_int(env_name: str, cfg_obj, cfg_attr: str):
+  v = _os.getenv(env_name)
+  if v is not None:
+    try:
+      return int(v)
+    except Exception:
+      return None
+  return getattr(cfg_obj, cfg_attr, None)
+
+def _env_or_config_float(env_name: str, cfg_obj, cfg_attr: str):
+  v = _os.getenv(env_name)
+  if v is not None:
+    try:
+      return float(v)
+    except Exception:
+      return None
+  return getattr(cfg_obj, cfg_attr, None)
+
+
 def get_dataset(
     dataset_name, tokenizer, wrap, mode, cache_dir,
     block_size=1024, num_proc=len(os.sched_getaffinity(0)),
