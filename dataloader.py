@@ -276,6 +276,28 @@ def get_text8_dataset(cache_dir, max_seq_length=256,
   return dataset
 
 
+def get_openwebtext_nosplit(cache_dir, max_samples=None):
+  """Load openwebtext without triggering split generation.
+  Downloads full dataset and applies custom split."""
+  print(f'Loading openwebtext without split generation')
+  # Load entire dataset without specifying split - this avoids "Generating train split"
+  dataset = datasets.load_dataset(
+    'openwebtext',
+    cache_dir=cache_dir,
+    streaming=False,
+    trust_remote_code=True)
+  
+  # dataset is a DatasetDict with 'train' split
+  data = dataset['train']
+  
+  # Limit if max_samples specified
+  if max_samples is not None:
+    print(f'Limiting to {max_samples} samples')
+    data = data.select(range(min(max_samples, len(data))))
+  
+  return data
+
+
 def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
   # Concatenate all texts.
   concatenated_examples = list(itertools.chain(* examples['input_ids']))
@@ -438,7 +460,7 @@ def get_dataset(
   elif dataset_name == 'lambada':
     detokenizer = lambada_detokenizer
   elif dataset_name.startswith('scientific_papers'):
-    detokenizer = scientific_papers_detokenizer
+    detokenizer = scientific_papers_det_tokenizer
   else:
     detokenizer = None
 
