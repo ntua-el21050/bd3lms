@@ -16,8 +16,6 @@ import requests
 import tokenizers
 import torch
 import transformers
-import numpy as np
-import os as _os  # small alias for env reads
 
 import utils
 
@@ -312,86 +310,6 @@ def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
   return result
 
 
-def _env_int(name):
-  v = _os.getenv(name)
-  try:
-    return int(v) if v is not None else None
-  except Exception:
-    return None
-
-def _env_float(name):
-  v = _os.getenv(name)
-  try:
-    return float(v) if v is not None else None
-  except Exception:
-    return None
-
-def _subsample_hf_dataset(hf_dataset, max_samples: typing.Optional[int]=None,
-                          fraction: typing.Optional[float]=None,
-                          seed: int = 42):
-  """Subsample a HuggingFace datasets.Dataset before expensive map/tokenize."""
-  if hf_dataset is None:
-    return None
-  try:
-    n = len(hf_dataset)
-  except Exception:
-    return hf_dataset
-  if max_samples is None and fraction is None:
-    return hf_dataset
-  if fraction is not None:
-    keep = int(n * float(fraction))
-  else:
-    keep = min(int(max_samples), n)
-  if keep <= 0 or keep >= n:
-    return hf_dataset
-  rng = np.random.default_rng(seed if seed is not None else 42)
-  indices = rng.permutation(n)[:keep].tolist()
-  print(f'[_subsample_hf_dataset] Applying early subsample: keeping {keep}/{n} examples')
-  return hf_dataset.select(indices)
-
-def _subsample_dataset(dataset, max_samples: typing.Optional[int]=None,
-                       fraction: typing.Optional[float]=None,
-                       seed: typing.Optional[int]=42):
-  """Return a torch.utils.data.Subset of dataset according to max_samples or fraction."""
-  if dataset is None:
-    return None
-  if max_samples is None and fraction is None:
-    return dataset
-  try:
-    n = len(dataset)
-  except Exception:
-    return dataset
-  if fraction is not None:
-    keep = int(n * float(fraction))
-  elif max_samples is not None:
-    keep = min(int(max_samples), n)
-  else:
-    return dataset
-  if keep <= 0:
-    return dataset
-  rng = np.random.default_rng(seed if seed is not None else 42)
-  indices = rng.permutation(n)[:keep].tolist()
-  return torch.utils.data.Subset(dataset, indices)
-
-def _env_or_config_int(env_name: str, cfg_obj, cfg_attr: str):
-  v = _os.getenv(env_name)
-  if v is not None:
-    try:
-      return int(v)
-    except Exception:
-      return None
-  return getattr(cfg_obj, cfg_attr, None)
-
-def _env_or_config_float(env_name: str, cfg_obj, cfg_attr: str):
-  v = _os.getenv(env_name)
-  if v is not None:
-    try:
-      return float(v)
-    except Exception:
-      return None
-  return getattr(cfg_obj, cfg_attr, None)
-
-
 def get_dataset(
     dataset_name, tokenizer, wrap, mode, cache_dir,
     block_size=1024, num_proc=len(os.sched_getaffinity(0)),
@@ -408,34 +326,10 @@ def get_dataset(
   _path = os.path.join(cache_dir, filename)
   
   if utils.fsspec_exists(_path):
-    print(f'Loading data from: {_path}')
-    loaded = datasets.load_from_disk(_path)
-    # try to apply early subsample based on env vars (mode available in scope)
-    try:
-      try:
-        orig_n = len(loaded)
-      except Exception:
-        orig_n = None
-      print(f'Cached dataset length before subsample: {orig_n}')
-      if mode == 'train':
-        max_samples = _env_int('BD3LM_MAX_TRAIN_SAMPLES')
-        fraction = _env_float('BD3LM_TRAIN_FRACTION')
-      else:
-        max_samples = _env_int('BD3LM_MAX_VALID_SAMPLES')
-        fraction = _env_float('BD3LM_VALID_FRACTION')
-      seed = _env_int('BD3LM_SEED') or 42
-      if (max_samples is not None) or (fraction is not None):
-        loaded = _subsample_hf_dataset(loaded, max_samples=max_samples, fraction=fraction, seed=seed)
-        try:
-          new_n = len(loaded)
-        except Exception:
-          new_n = None
-        print(f'Loaded cached {_path} and applied early subsample (before={orig_n} after={new_n}).')
-    except Exception:
-      print('Warning: Early subsample on cached dataset failed — returning full cached dataset.')
-    return loaded.with_format('torch')
-  print(f'Generating new data at: {_path}')
-  print(f'streaming={streaming}')  
+    LOGGER.info(f'Loading data from: {_path}')
+    return datasets.load_from_disk(_path).with_format('torch')
+  LOGGER.info(f'Generating new data at: {_path}')
+  LOGGER.info(f'{streaming=}')  
 
   crop_train = dataset_name == 'text8-crop'
   if mode == 'train' and crop_train:
@@ -519,28 +413,6 @@ def get_dataset(
     data = dataset
   else:
     data = dataset[mode]
-
-  try:
-    orig_n = len(data)
-  except Exception:
-    orig_n = None
-  print(f'Raw dataset length before early subsample/tokenize: {orig_n} (mode={mode})')
-  # Early subsample raw dataset before tokenization if env vars set
-  if mode == 'train':
-    max_samples = _env_int('BD3LM_MAX_TRAIN_SAMPLES')
-    fraction = _env_float('BD3LM_TRAIN_FRACTION')
-    seed = _env_int('BD3LM_SEED') or 42
-  else:
-    max_samples = _env_int('BD3LM_MAX_VALID_SAMPLES')
-    fraction = _env_float('BD3LM_VALID_FRACTION')
-    seed = _env_int('BD3LM_SEED') or 42
-  if max_samples is not None or fraction is not None:
-    data = _subsample_hf_dataset(data, max_samples=max_samples, fraction=fraction, seed=seed)
-  try:
-    new_n = len(data)
-  except Exception:
-    new_n = None
-  print(f'Raw dataset subsample applied (before={orig_n} after={new_n}, max_samples={max_samples}, fraction={fraction})')
 
   if dataset_name.startswith('wikitext'):
     detokenizer = wt_detokenizer
@@ -727,13 +599,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("train_revision", None))
-  # optional subsample for faster/debug runs:
-  # precedence: environment vars (BD3LM_...) -> config.data attributes (if present)
-  train_set = _subsample_dataset(
-    train_set,
-    max_samples=_env_or_config_int('BD3LM_MAX_TRAIN_SAMPLES', config.data, 'max_train_samples'),
-    fraction=_env_or_config_float('BD3LM_TRAIN_FRACTION', config.data, 'train_fraction'),
-    seed=_env_or_config_int('BD3LM_SEED', config.data, 'seed'))
+  
   if config.data.valid in ['text8', 'lm1b', 'ag_news']:
     validation_split = 'test'
   else:
@@ -752,26 +618,18 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       block_size=config.model.length,
       streaming=config.data.streaming,
       revision=config.data.get("valid_revision", None))
-  # optional subsample for validation (env fallback -> config)
-  valid_set = _subsample_dataset(
-    valid_set,
-    max_samples=_env_or_config_int('BD3LM_MAX_VALID_SAMPLES', config.data, 'max_valid_samples'),
-    fraction=_env_or_config_float('BD3LM_VALID_FRACTION', config.data, 'valid_fraction'),
-    seed=_env_or_config_int('BD3LM_SEED', config.data, 'seed'))
 
   if skip_train:
     train_loader = None
   else:
-    num_workers_train = _env_or_config_int('BD3LM_NUM_WORKERS_KAGGLE', config.loader, 'num_workers_kaggle') or getattr(config.loader, 'num_workers', 0)
     train_loader = torch.utils.data.DataLoader(
       train_set,
       batch_size=config.loader.batch_size,
-      num_workers=num_workers_train,
-      pin_memory=getattr(config.loader, 'pin_memory', False),
+      num_workers=config.loader.num_workers,
+      pin_memory=config.loader.pin_memory,
       shuffle=not config.data.streaming,
       persistent_workers=True)
     train_loader.tokenizer = tokenizer
-
   if skip_valid:
     valid_loader = None
   else:
@@ -781,17 +639,18 @@ def get_dataloaders(config, tokenizer, skip_train=False,
     else:
       shuffle_valid = True
       generator = torch.Generator().manual_seed(valid_seed)
-    num_workers_eval = _env_or_config_int('BD3LM_NUM_WORKERS_KAGGLE', config.loader, 'num_workers_kaggle') or getattr(config.loader, 'num_workers', 0)
     valid_loader = torch.utils.data.DataLoader(
       valid_set,
       batch_size=config.loader.eval_batch_size,
-      num_workers=num_workers_eval,
-      pin_memory=getattr(config.loader, 'pin_memory', False),
+      num_workers=config.loader.num_workers,
+      pin_memory=config.loader.pin_memory,
       shuffle=shuffle_valid,
       generator=generator)
+    # Will be used in generative perplexity calculation
     valid_loader.tokenizer = tokenizer
 
   return train_loader, valid_loader
+
 
 # Samplers adapted from: https://github.com/Dao-AILab/flash-attention/blob/main/training/src/datamodules/fault_tolerant_sampler.py
 
@@ -799,6 +658,10 @@ def get_dataloaders(config, tokenizer, skip_train=False,
 class RandomFaultTolerantSampler(torch.utils.data.RandomSampler):
 
   def __init__(self, *args, generator=None, **kwargs):
+    # TD [2022-07-17]: We don't force the seed to be zero. We generate random seed,
+    # which should be reproducible if pl.seed_everything was called beforehand.
+    # This means that changing the seed of the experiment will also change the
+    # sampling order.
     if generator is None:
       seed = int(torch.empty((), dtype=torch.int64).random_().item())
       generator = torch.Generator().manual_seed(seed)
@@ -814,20 +677,28 @@ class RandomFaultTolerantSampler(torch.utils.data.RandomSampler):
   def load_state_dict(self, state_dict):
     self.generator.set_state(state_dict.get('random_state'))
     self.counter = state_dict['counter']
+    # self.start_counter = self.counter
     self.restarting = True
+
+  # TD [2022-08-28] Setting the len will cause PL to think there are only a few batches left per
+  # epoch, and subsequent epoch will have very few batches.
 
   def __iter__(self) -> typing.Iterator[int]:
     n = len(self.data_source)
+
     self.state = self.generator.get_state()
     indices = torch.randperm(n, generator=self.generator).tolist()
+
     if not self.restarting:
       self.counter = 0
     else:
       indices = indices[self.counter:]
       self.restarting = False
+
     for index in indices:
       self.counter += 1
       yield index
+
     self.counter = 0
 
 
@@ -846,31 +717,42 @@ class FaultTolerantDistributedSampler(torch.utils.data.DistributedSampler):
     self.counter = state_dict['counter']
     self.restarting = True
 
+  # TD [2022-08-28] Setting the len will cause PL to think there are only a few batches left per
+  # epoch, and subsequent epoch will have very few batches.
   def __iter__(self):
     if self.shuffle:
+      # deterministically shuffle based on epoch and seed
       g = torch.Generator()
       g.manual_seed(self.seed + self.epoch)
-      indices = torch.randperm(len(self.dataset), generator=g).tolist()
+      indices = torch.randperm(len(self.dataset), generator=g).tolist()  # type: ignore[arg-type]
     else:
-      indices = list(range(len(self.dataset)))
+      indices = list(range(len(self.dataset)))  # type: ignore[arg-type]
+
     if not self.drop_last:
+      # add extra samples to make it evenly divisible
       padding_size = self.total_size - len(indices)
       if padding_size <= len(indices):
         indices += indices[:padding_size]
       else:
-        indices += (indices * math.ceil(padding_size / len(indices)))[:padding_size]
+        indices += (indices * math.ceil(
+          padding_size / len(indices)))[:padding_size]
     else:
+      # remove tail of data to make it evenly divisible.
       indices = indices[:self.total_size]
     assert len(indices) == self.total_size
+
+    # subsample
     indices = indices[self.rank:self.total_size:self.num_replicas]
     assert len(indices) == self.num_samples
+
     if not self.restarting:
       self.counter = 0
     else:
       indices = indices[self.counter:]
       self.restarting = False
+
     for index in indices:
       self.counter += 1
       yield index
-    self.counter = 0
 
+    self.counter = 0
