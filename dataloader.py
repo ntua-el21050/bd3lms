@@ -328,10 +328,15 @@ def get_dataset(
   _path = os.path.join(cache_dir, filename)
   
   if utils.fsspec_exists(_path):
-    LOGGER.info(f'Loading data from: {_path}')
+    print(f'Loading data from: {_path}')
     loaded = datasets.load_from_disk(_path)
     # try to apply early subsample based on env vars (mode available in scope)
     try:
+      try:
+        orig_n = len(loaded)
+      except Exception:
+        orig_n = None
+      print(f'Cached dataset length before subsample: {orig_n}')
       if mode == 'train':
         max_samples = _env_int('BD3LM_MAX_TRAIN_SAMPLES')
         fraction = _env_float('BD3LM_TRAIN_FRACTION')
@@ -341,9 +346,13 @@ def get_dataset(
       seed = _env_int('BD3LM_SEED') or 42
       if (max_samples is not None) or (fraction is not None):
         loaded = _subsample_hf_dataset(loaded, max_samples=max_samples, fraction=fraction, seed=seed)
-        LOGGER.info(f'Loaded cached {_path} and applied early subsample.')
+        try:
+          new_n = len(loaded)
+        except Exception:
+          new_n = None
+        print(f'Loaded cached {_path} and applied early subsample (before={orig_n} after={new_n}).')
     except Exception:
-      LOGGER.warning('Early subsample on cached dataset failed — returning full cached dataset.')
+      print('Warning: Early subsample on cached dataset failed — returning full cached dataset.')
     return loaded.with_format('torch')
   LOGGER.info(f'Generating new data at: {_path}')
   LOGGER.info(f'{streaming=}')  
@@ -431,6 +440,11 @@ def get_dataset(
   else:
     data = dataset[mode]
 
+  try:
+    orig_n = len(data)
+  except Exception:
+    orig_n = None
+  print(f'Raw dataset length before early subsample/tokenize: {orig_n} (mode={mode})')
   # Early subsample raw dataset before tokenization if env vars set
   if mode == 'train':
     max_samples = _env_int('BD3LM_MAX_TRAIN_SAMPLES')
@@ -442,6 +456,11 @@ def get_dataset(
     seed = _env_int('BD3LM_SEED') or 42
   if max_samples is not None or fraction is not None:
     data = _subsample_hf_dataset(data, max_samples=max_samples, fraction=fraction, seed=seed)
+  try:
+    new_n = len(data)
+  except Exception:
+    new_n = None
+  print(f'Raw dataset subsample applied (before={orig_n} after={new_n}, max_samples={max_samples}, fraction={fraction})')
 
   if dataset_name.startswith('wikitext'):
     detokenizer = wt_detokenizer
