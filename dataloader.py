@@ -327,7 +327,12 @@ def get_dataset(
   
   if utils.fsspec_exists(_path):
     LOGGER.info(f'Loading data from: {_path}')
-    return datasets.load_from_disk(_path).with_format('torch')
+    dataset = datasets.load_from_disk(_path)
+    # Limit cached dataset if max_samples specified
+    if max_samples is not None:
+      LOGGER.info(f'Limiting cached dataset to {max_samples} samples')
+      dataset = dataset.select(range(min(max_samples, len(dataset))))
+    return dataset.with_format('torch')
   LOGGER.info(f'Generating new data at: {_path}')
   LOGGER.info(f'{streaming=}')  
 
@@ -335,11 +340,6 @@ def get_dataset(
   if mode == 'train' and crop_train:
     # double block size for sub-sampling
     block_size *= 2
-  
-  # Prepare split string with max_samples limit
-  split_str = mode
-  if max_samples is not None and not streaming:
-    split_str = f'{mode}[:{max_samples}]'
   
   if dataset_name == 'wikitext103':
     dataset = datasets.load_dataset(
@@ -370,23 +370,17 @@ def get_dataset(
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size, crop_train=True)
   elif dataset_name == 'openwebtext-train':
-    split = 'train[:-100000]'
-    if max_samples is not None:
-      split = f'train[:-100000][:{max_samples}]'
     dataset = datasets.load_dataset(
       'openwebtext',
-      split=split,
+      split='train[:-100000]',
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
       trust_remote_code=True)
   elif dataset_name == 'openwebtext-valid':
-    split = 'train[-100000:]'
-    if max_samples is not None:
-      split = f'train[-100000:][:{max_samples}]'
     dataset = datasets.load_dataset(
       'openwebtext',
-      split=split,
+      split='train[-100000:]',
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
@@ -425,9 +419,9 @@ def get_dataset(
   else:
     data = dataset[mode]
 
-  # Limit dataset size before tokenization if max_samples is specified
-  if max_samples is not None:
-    LOGGER.info(f'Limiting dataset to {max_samples} samples')
+  # Limit dataset size IMMEDIATELY after loading, before any processing
+  if max_samples is not None and not streaming:
+    LOGGER.info(f'Limiting dataset to {max_samples} samples (before processing)')
     if isinstance(data, datasets.DatasetDict):
       data = {k: v.select(range(min(max_samples, len(v)))) for k, v in data.items()}
     else:
