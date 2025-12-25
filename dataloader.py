@@ -190,7 +190,13 @@ def tokenize_dataset(
 # Entry point
 # ---------------------------------------------------------
 
-def _build_datasets(cfg: DictConfig, tokenizer):
+def _build_datasets(
+    cfg: DictConfig,
+    tokenizer,
+    skip_train: bool = False,
+    skip_valid: bool = False,
+    valid_seed: Optional[int] = None,
+):
     raw_dataset = load_raw_dataset(cfg)
 
     text_column = (
@@ -199,18 +205,19 @@ def _build_datasets(cfg: DictConfig, tokenizer):
         else _default_text_column(raw_dataset)
     )
 
+    # manual split BEFORE tokenization
     train_raw, valid_raw = manual_train_valid_split(
         raw_dataset,
         max_train_samples=cfg.data.get("max_train_samples"),
         max_valid_samples=cfg.data.get("max_valid_samples"),
-        seed=cfg.data.get("seed", 42),
+        seed=valid_seed if valid_seed is not None else cfg.data.get("seed", 42),
     )
 
     num_proc = cfg.data.get("num_proc", 4)
     block_size = cfg.model.length
 
     train_ds = None
-    if train_raw is not None:
+    if not skip_train and train_raw is not None:
         train_ds = tokenize_dataset(
             train_raw,
             tokenizer,
@@ -219,15 +226,18 @@ def _build_datasets(cfg: DictConfig, tokenizer):
             num_proc,
         )
 
-    valid_ds = tokenize_dataset(
-        valid_raw,
-        tokenizer,
-        text_column,
-        block_size,
-        num_proc,
-    )
+    valid_ds = None
+    if not skip_valid and valid_raw is not None:
+        valid_ds = tokenize_dataset(
+            valid_raw,
+            tokenizer,
+            text_column,
+            block_size,
+            num_proc,
+        )
 
     return train_ds, valid_ds
+
 
 
 # ---------------------------------------------------------
@@ -265,35 +275,39 @@ def build_dataloader(
 
 
 def get_dataloaders(
-    config,
+    cfg: DictConfig,
     tokenizer,
-    skip_train=False,
-    skip_valid=False,
-    valid_seed=None,
+    skip_train: bool = False,
+    skip_valid: bool = False,
+    valid_seed: Optional[int] = None,
 ):
-    train_ds, valid_ds = _build_datasets(config, tokenizer)
+    train_ds, valid_ds = _build_datasets(
+        cfg,
+        tokenizer,
+        skip_train=skip_train,
+        skip_valid=skip_valid,
+        valid_seed=valid_seed,
+    )
 
     train_loader = None
-    if not skip_train and train_ds is not None and config.mode == "train":
+    if train_ds is not None:
         train_loader = build_dataloader(
             train_ds,
-            batch_size=config.loader.batch_size,
+            batch_size=cfg.loader.batch_size,
             shuffle=True,
-            num_workers=config.loader.get("num_workers", 4),
+            num_workers=cfg.loader.get("num_workers", 4),
         )
-        train_loader.tokenizer = tokenizer
 
     valid_loader = None
-    if not skip_valid:
+    if valid_ds is not None:
         valid_loader = build_dataloader(
             valid_ds,
-            batch_size=config.loader.eval_batch_size,
+            batch_size=cfg.loader.eval_batch_size,
             shuffle=False,
-            num_workers=config.loader.get("num_workers", 4),
+            num_workers=cfg.loader.get("num_workers", 4),
         )
-        valid_loader.tokenizer = tokenizer
-
     return train_loader, valid_loader
+
 
 def get_tokenizer(config):
     if config.data.tokenizer_name_or_path == 'text8':
