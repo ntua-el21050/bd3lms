@@ -76,7 +76,7 @@ def _default_text_column(dataset: Dataset) -> str:
 def load_raw_dataset(cfg: DictConfig) -> Dataset:
     """
     Loads the full raw dataset WITHOUT split.
-    Uses bd3lms-style config (data.train / data.valid).
+    Resolves bd3lms dataset aliases to HF datasets.
     """
 
     dataset_name = (
@@ -86,14 +86,29 @@ def load_raw_dataset(cfg: DictConfig) -> Dataset:
     if dataset_name is None:
         raise ValueError("Dataset name must be set in cfg.data.train or cfg.data.valid")
 
+    # -----------------------------
+    # Dataset name resolution
+    # -----------------------------
+    if dataset_name == "wikitext103":
+        hf_name = "wikitext"
+        hf_config = "wikitext-103-raw-v1"
+    elif dataset_name == "wikitext2":
+        hf_name = "wikitext"
+        hf_config = "wikitext-2-raw-v1"
+    else:
+        hf_name = dataset_name
+        hf_config = None
+
     dataset = load_dataset(
-        dataset_name,
+        hf_name,
+        hf_config,
         split="train",
         cache_dir=cfg.data.cache_dir,
         trust_remote_code=True,
     )
 
     return dataset
+
 
 
 
