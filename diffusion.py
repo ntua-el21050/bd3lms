@@ -355,6 +355,8 @@ class Diffusion(L.LightningModule):
     assert self.metrics.train_nlls.nll.weight == 0
 
   def training_step(self, batch, batch_idx):
+    print(type(batch['input_ids']))               #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
     del batch_idx
     losses = self._loss(batch['input_ids'],
                         batch['attention_mask'])
