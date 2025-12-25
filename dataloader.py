@@ -245,16 +245,14 @@ def _build_datasets(
 # ---------------------------------------------------------
 
 def collate_fn(batch):
-    """
-    Simple causal LM collator.
-    """
-    input_ids = torch.tensor([x["input_ids"] for x in batch], dtype=torch.long)
-    labels = torch.tensor([x["labels"] for x in batch], dtype=torch.long)
+    input_ids = torch.stack([x["input_ids"] for x in batch])
+    attention_mask = torch.ones_like(input_ids)
 
     return {
         "input_ids": input_ids,
-        "labels": labels,
+        "attention_mask": attention_mask,
     }
+
 
 
 def build_dataloader(
