@@ -1,4 +1,6 @@
 import os
+os.environ["WANDB_DISABLED"] = "true"
+
 import fsspec
 import hydra
 import lightning as L
