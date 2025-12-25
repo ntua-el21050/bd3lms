@@ -1,5 +1,6 @@
 import os
 os.environ["WANDB_DISABLED"] = "true"
+os.environ["WANDB_MODE"] = "disabled"
 
 import fsspec
 import hydra
