@@ -263,3 +263,32 @@ def get_dataloaders(cfg: DictConfig):
     )
 
     return train_loader, valid_loader, tokenizer
+
+def get_tokenizer(config):
+    if config.data.tokenizer_name_or_path == 'text8':
+        tokenizer = Text8Tokenizer()
+    elif config.data.tokenizer_name_or_path == 'bert-base-uncased':
+        tokenizer = transformers.BertTokenizer.from_pretrained(
+            'bert-base-uncased'
+        )
+    else:
+        tokenizer = transformers.AutoTokenizer.from_pretrained(
+            config.data.tokenizer_name_or_path,
+            trust_remote_code=True
+        )
+
+    # GPT-style tokenizers need BOS/EOS post processing
+    if isinstance(tokenizer, (transformers.GPT2TokenizerFast, transformers.GPT2Tokenizer)):
+        tokenizer._tokenizer.post_processor = tokenizers.processors.BertProcessing(
+            (tokenizer.bos_token, tokenizer.bos_token_id),
+            (tokenizer.eos_token, tokenizer.eos_token_id),
+        )
+
+    if tokenizer.bos_token is None:
+        tokenizer.bos_token = tokenizer.cls_token
+    if tokenizer.eos_token is None:
+        tokenizer.eos_token = tokenizer.sep_token
+    if tokenizer.pad_token is None:
+        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+
+    return tokenizer
