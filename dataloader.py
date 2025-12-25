@@ -297,6 +297,8 @@ def get_dataloaders(
             shuffle=True,
             num_workers=cfg.loader.get("num_workers", 4),
         )
+        # 🔑 REQUIRED BY main.py
+        train_loader.tokenizer = tokenizer
 
     valid_loader = None
     if valid_ds is not None:
@@ -306,7 +308,11 @@ def get_dataloaders(
             shuffle=False,
             num_workers=cfg.loader.get("num_workers", 4),
         )
+        # 🔑 REQUIRED BY main.py
+        valid_loader.tokenizer = tokenizer
+
     return train_loader, valid_loader
+
 
 
 def get_tokenizer(config):
