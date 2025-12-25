@@ -245,7 +245,11 @@ def _build_datasets(
 # ---------------------------------------------------------
 
 def collate_fn(batch):
-    input_ids = torch.stack([x["input_ids"] for x in batch])
+    input_ids = torch.tensor(
+        [x["input_ids"] for x in batch],
+        dtype=torch.long
+    )
+
     attention_mask = torch.ones_like(input_ids)
 
     return {
