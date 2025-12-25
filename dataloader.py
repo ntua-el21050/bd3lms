@@ -76,19 +76,25 @@ def _default_text_column(dataset: Dataset) -> str:
 def load_raw_dataset(cfg: DictConfig) -> Dataset:
     """
     Loads the full raw dataset WITHOUT split.
+    Uses bd3lms-style config (data.train / data.valid).
     """
 
-    if cfg.data.name is None:
-        raise ValueError("cfg.data.name must be set")
+    dataset_name = (
+        cfg.data.train if cfg.mode == "train" else cfg.data.valid
+    )
+
+    if dataset_name is None:
+        raise ValueError("Dataset name must be set in cfg.data.train or cfg.data.valid")
 
     dataset = load_dataset(
-        cfg.data.name,
-        cfg.data.get("config", None),
+        dataset_name,
         split="train",
+        cache_dir=cfg.data.cache_dir,
         trust_remote_code=True,
     )
 
     return dataset
+
 
 
 # ---------------------------------------------------------
