@@ -77,7 +77,7 @@ trainer:
   log_every_n_steps: 1_000
   limit_train_batches: 1.0   # train on full dataset, can be used to toggle quick run
   limit_val_batches: 1.0     # validate on full dataset, can be used to toggle quick run
-  val_check_interval: 10_000
+  val_check_interval: 2 # THIS WAS CHANGED FOR SMALLER DATASET (used to be 10_000)
 
 wandb:
   project: BD3-LMs
