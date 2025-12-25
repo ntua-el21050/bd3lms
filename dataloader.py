@@ -743,35 +743,20 @@ def _build_datasets(
 
 def collate_fn(batch):
     """
-    Simple collate function that properly handles tensor conversion.
+    Collate that guarantees torch.Tensor [B, T]
     """
-    # Stack or convert input_ids to tensor
-    input_ids_list = [item["input_ids"] for item in batch]
-    
-    # Handle different input types
-    if isinstance(input_ids_list[0], torch.Tensor):
-        input_ids = torch.stack(input_ids_list)
-    else:
-        # Convert list to tensor
-        input_ids = torch.tensor(input_ids_list, dtype=torch.long)
-    
-    # Create attention mask
+    input_ids = torch.stack([
+        torch.as_tensor(item["input_ids"], dtype=torch.long)
+        for item in batch
+    ])
+
     attention_mask = torch.ones_like(input_ids)
-    
-    result = {
+
+    return {
         "input_ids": input_ids,
         "attention_mask": attention_mask,
     }
-    
-    # Include labels if present
-    if "labels" in batch[0]:
-        labels_list = [item["labels"] for item in batch]
-        if isinstance(labels_list[0], torch.Tensor):
-            result["labels"] = torch.stack(labels_list)
-        else:
-            result["labels"] = torch.tensor(labels_list, dtype=torch.long)
-    
-    return result
+
 
 
 
