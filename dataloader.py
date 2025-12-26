@@ -420,7 +420,7 @@ def get_dataset(
   elif dataset_name == 'ag_news':
     dataset = datasets.load_dataset(
       'ag_news',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode, #There is a chance that this could throw an error if mode == 'Validation'. ag_news may not have a validation split.
       cache_dir=cache_dir,
       streaming=streaming,
       revision=revision)
