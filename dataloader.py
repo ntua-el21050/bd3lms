@@ -249,6 +249,7 @@ def load_raw_dataset(cfg: DictConfig):
     if dataset_name is None:
         raise ValueError("Dataset name must be set in cfg.data.train or cfg.data.valid")
 
+    print(f"Dataset {dataset_name}. 111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n111\n")
     # Dataset name resolution
     if dataset_name == "wikitext103":
         dataset = load_dataset(
@@ -337,6 +338,7 @@ def load_raw_dataset(cfg: DictConfig):
         return dataset['train']
     
     else:
+        print(f"Dataset {dataset_name}. $$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n")
         # Generic dataset loading
         dataset = load_dataset(
             dataset_name,
