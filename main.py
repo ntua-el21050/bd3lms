@@ -141,7 +141,7 @@ def _ppl_eval(config, logger, tokenizer):
   config.seed = seed
   _, valid_ds = dataloader.get_dataloaders(
     config, tokenizer, skip_train=True, valid_seed=seed)
-  trainer.validate(model, dataloaders=valid_ds)
+  trainer.validate(model, valid_ds)
 
 def _train(config, logger, tokenizer):
   logger.info('Starting Training.')
@@ -203,13 +203,7 @@ def _train(config, logger, tokenizer):
     strategy=hydra.utils.instantiate(config.strategy),
     logger=wandb_logger)
 
-  print('TRAIN:', type(train_ds))     #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  print('VAL:', type(valid_ds))
-
-  batch = next(iter(train_ds))
-  print(type(batch['input_ids']))
-
-  trainer.fit(model, train_dataloaders=train_ds, val_dataloaders=valid_ds, ckpt_path=ckpt_path)
+  trainer.fit(model, train_ds, valid_ds, ckpt_path=ckpt_path)
   
 @hydra.main(version_base=None, config_path='configs',
             config_name='config')

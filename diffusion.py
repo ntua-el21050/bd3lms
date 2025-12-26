@@ -264,8 +264,7 @@ class Diffusion(L.LightningModule):
           pin_memory=self.config.loader.pin_memory,
           sampler=dl_sampler,
           shuffle=False,
-          persistent_workers=False,
-          collate_fn=dl.collate_fn))
+          persistent_workers=True))
     self.trainer.fit_loop._combined_loader.flattened = updated_dls
 
   def optimizer_step(self, *args, **kwargs):
@@ -356,8 +355,6 @@ class Diffusion(L.LightningModule):
     assert self.metrics.train_nlls.nll.weight == 0
 
   def training_step(self, batch, batch_idx):
-    print(type(batch['input_ids']))               #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
     del batch_idx
     losses = self._loss(batch['input_ids'],
                         batch['attention_mask'])
