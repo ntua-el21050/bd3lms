@@ -648,6 +648,7 @@ def _build_datasets(
         
         valid_raw = raw_dataset[valid_split] if valid_split in raw_dataset and not skip_valid else None
         
+        print(f"Dataset {dataset_name} comes pre-split. train_raw={train_raw}, valid_raw={valid_raw}$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n")
         # Apply max samples limits ΕΔΏ ΚΡΑΤΆΜΕ ΤΟΝ ΈΛΕΓΧΟ ΜΕΓΈΘΟΥΣ
         if train_raw is not None and cfg.data.get("max_train_samples"):
             max_samples = min(cfg.data.max_train_samples, len(train_raw))
@@ -668,6 +669,7 @@ def _build_datasets(
             train_raw = raw_dataset if not skip_train else None
             valid_raw = None
         
+        print(f"Dataset {dataset_name} comes pre-split. train_raw={train_raw}, valid_raw={valid_raw}\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n%%%\n")
         # Apply max samples limits
         if train_raw is not None and cfg.data.get("max_train_samples"):
             max_samples = min(cfg.data.max_train_samples, len(train_raw))
@@ -680,6 +682,7 @@ def _build_datasets(
         text_column = 'text'
     
     else:
+        print("HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
         # Normal datasets - do manual split
         text_column = (
             cfg.data.text_column
