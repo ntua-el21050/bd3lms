@@ -11,6 +11,7 @@ import zipfile
 from typing import Optional
 
 import datasets
+from datasets import Dataset
 import fsspec
 import requests
 import tokenizers
