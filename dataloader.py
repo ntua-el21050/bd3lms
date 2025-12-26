@@ -398,9 +398,11 @@ def get_dataset(
     dataset = get_text8_dataset(
       cache_dir, max_seq_length=block_size, crop_train=True, max_samples=max_samples)
   elif dataset_name == 'openwebtext-train':
+    print("###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n")
     dataset = datasets.load_dataset(
       'openwebtext',
-      split=f'train[:{max_samples["train"]}]' if max_samples["train"] is not None else 'train:-100000',
+      #split=f'train[:{max_samples["train"]}]' if max_samples["train"] is not None else 'train:-100000',
+      split=f'train[:100]',
       cache_dir=cache_dir,
       revision=revision,
       streaming=False,
