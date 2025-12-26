@@ -285,6 +285,21 @@ def get_text8_dataset(cache_dir, max_seq_length=256,
   return dataset
 
 
+def get_streaming_samples(dataset, max_samples_count):
+    """Παίρνει N samples από streaming dataset"""
+    if max_samples_count is None:
+        return dataset
+    samples = []
+    for i, example in enumerate(dataset):
+        if i >= max_samples_count:
+            break
+        samples.append(example)
+    
+    # Μετατροπή σε regular Dataset
+    return Dataset.from_list(samples)
+
+
+
 def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
   # Concatenate all texts.
   concatenated_examples = list(itertools.chain(* examples['input_ids']))
@@ -323,7 +338,7 @@ def get_dataset(
     cfg,
     dataset_name, tokenizer, wrap, mode, cache_dir,
     block_size=1024, num_proc=len(os.sched_getaffinity(0)),
-    streaming=False, revision : Optional[str]=None, insert_eos=True, insert_special_tokens=True):
+    streaming=True, revision : Optional[str]=None, insert_eos=True, insert_special_tokens=True):
   eos_tag = ''
   if not insert_eos:
     eos_tag = '_eosFalse'
@@ -366,86 +381,205 @@ def get_dataset(
     # double block size for sub-sampling
     block_size *= 2
   
+  use_streaming = streaming and max_samples[mode] is not None
+
   if dataset_name == 'wikitext103':
-    dataset = datasets.load_dataset(
-      'wikitext',
-      name='wikitext-103-raw-v1',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
-      cache_dir=cache_dir,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          # Χρήση streaming για να αποφύγουμε full download
+          stream_dataset = datasets.load_dataset(
+              'wikitext',
+              name='wikitext-103-raw-v1',
+              split=mode,
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=True
+          )
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          dataset = datasets.load_dataset(
+              'wikitext',
+              name='wikitext-103-raw-v1',
+              split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+              cache_dir=cache_dir,
+              revision=revision)
   elif dataset_name == 'wikitext2':
-    dataset = datasets.load_dataset(
-      'wikitext',
-      name='wikitext-2-raw-v1',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
-      cache_dir=cache_dir,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          stream_dataset = datasets.load_dataset(
+              'wikitext',
+              name='wikitext-2-raw-v1',
+              split=mode,
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=True
+          )
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          dataset = datasets.load_dataset(
+              'wikitext',
+              name='wikitext-2-raw-v1',
+              split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+              cache_dir=cache_dir,
+              revision=revision)
   elif dataset_name == 'ptb':
-    dataset = datasets.load_dataset(
-      'ptb_text_only',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
-      cache_dir=cache_dir,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          stream_dataset = datasets.load_dataset(
+              'ptb_text_only',
+              split=mode,
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=True
+          )
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          dataset = datasets.load_dataset(
+              'ptb_text_only',
+              split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+              cache_dir=cache_dir,
+              revision=revision)
   elif dataset_name == 'lambada':
-    dataset = get_lambada_test_dataset()
+      dataset = get_lambada_test_dataset()
   elif dataset_name == 'text8':
-    assert wrap
-    assert revision is None
-    dataset = get_text8_dataset(
-      cache_dir, max_seq_length=block_size, max_samples=max_samples)
+      assert wrap
+      assert revision is None
+      dataset = get_text8_dataset(
+          cache_dir, max_seq_length=block_size, max_samples=max_samples)
   elif dataset_name == 'text8-crop':
-    assert revision is None
-    dataset = get_text8_dataset(
-      cache_dir, max_seq_length=block_size, crop_train=True, max_samples=max_samples)
+      assert revision is None
+      dataset = get_text8_dataset(
+          cache_dir, max_seq_length=block_size, crop_train=True, max_samples=max_samples)
   elif dataset_name == 'openwebtext-train':
-    print("###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n")
-    dataset = datasets.load_dataset(
-      'openwebtext',
-      #split=f'train[:{max_samples["train"]}]' if max_samples["train"] is not None else 'train:-100000',
-      split=f'train[:100]',
-      cache_dir=cache_dir,
-      revision=revision,
-      streaming=False,
-      trust_remote_code=True)
+      # ΕΙΔΙΚΗ ΠΕΡΙΠΤΩΣΗ ΓΙΑ OPENWEBTEXT - ΠΑΝΤΑ streaming όταν έχουμε max_samples
+      # Το OpenWebText είναι πολύ μεγάλο, οπότε χρησιμοποιούμε πάντα streaming για samples
+      if max_samples["train"] is not None:
+          # Streaming για να αποφύγουμε το download 24GB
+          stream_dataset = datasets.load_dataset(
+              'openwebtext',
+              split='train',
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=True,  # ΠΑΝΤΑ streaming για samples περιορισμό
+              trust_remote_code=True
+          )
+          dataset = get_streaming_samples(stream_dataset, max_samples["train"])
+      else:
+          # Αν δεν έχουμε max_samples, χρησιμοποιούμε το slice όπως πριν
+          dataset = datasets.load_dataset(
+              'openwebtext',
+              split='train[:-100000]',  # Χρησιμοποιούμε slice για validation
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=False,
+              trust_remote_code=True)
   elif dataset_name == 'openwebtext-valid':
-    dataset = datasets.load_dataset(
-      'openwebtext',
-      split=f'train[{max_samples["train"]}:{max_samples["train"] + max_samples["validation"]}]' if (max_samples["train"] is not None and max_samples["validation"] is not None) else 'train[-100000:]',
-      cache_dir=cache_dir,
-      revision=revision,
-      streaming=False,
-      trust_remote_code=True)
+      # Για validation, χρησιμοποιούμε streaming αν έχουμε max_samples
+      if max_samples["validation"] is not None:
+          stream_dataset = datasets.load_dataset(
+              'openwebtext',
+              split='train',
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=True,  # ΠΑΝΤΑ streaming για samples περιορισμό
+              trust_remote_code=True
+          ) 
+          # Παίρνουμε τα τελευταία N samples για validation
+          if max_samples["train"] is not None:
+              # Αν έχουμε και train samples, παραλείπουμε αυτά πρώτα
+              total_skip = max_samples["train"]
+              # Παίρνουμε validation samples μετά τα train
+              val_samples = []
+              for i, example in enumerate(stream_dataset):
+                  if i < total_skip:
+                      continue
+                  if len(val_samples) >= max_samples["validation"]:
+                      break
+                  val_samples.append(example)
+              from datasets import Dataset
+              dataset = Dataset.from_list(val_samples)
+          else:
+              # Παίρνουμε απλά τα τελευταία N samples
+              dataset = get_streaming_samples(stream_dataset, max_samples["validation"])
+      else:
+          # Αν δεν έχουμε max_samples, χρησιμοποιούμε το slice όπως πριν
+          dataset = datasets.load_dataset(
+              'openwebtext',
+              split='train[-100000:]',
+              cache_dir=cache_dir,
+              revision=revision,
+              streaming=False,
+              trust_remote_code=True)
   elif dataset_name == 'scientific_papers_arxiv':
-    dataset = datasets.load_dataset(
-      'scientific_papers', 'arxiv',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
-      trust_remote_code=True,
-      cache_dir=cache_dir,
-      streaming=streaming,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          stream_dataset = datasets.load_dataset(
+              'scientific_papers', 'arxiv',
+              split=mode,
+              trust_remote_code=True,
+              cache_dir=cache_dir,
+              streaming=True,
+              revision=revision)
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          dataset = datasets.load_dataset(
+              'scientific_papers', 'arxiv',
+              split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+              trust_remote_code=True,
+              cache_dir=cache_dir,
+              streaming=streaming,
+              revision=revision)
   elif dataset_name == 'scientific_papers_pubmed':
-    dataset = datasets.load_dataset(
-      'scientific_papers', 'pubmed',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
-      trust_remote_code=True,
-      cache_dir=cache_dir,
-      streaming=streaming,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          stream_dataset = datasets.load_dataset(
+              'scientific_papers', 'pubmed',
+              split=mode,
+              trust_remote_code=True,
+              cache_dir=cache_dir,
+              streaming=True,
+              revision=revision)
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          dataset = datasets.load_dataset(
+              'scientific_papers', 'pubmed',
+              split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+              trust_remote_code=True,
+              cache_dir=cache_dir,
+              streaming=streaming,
+              revision=revision)
   elif dataset_name == 'ag_news':
-    dataset = datasets.load_dataset(
-      'ag_news',
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode, #There is a chance that this could throw an error if mode == 'Validation'. ag_news may not have a validation split.
-      cache_dir=cache_dir,
-      streaming=streaming,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          stream_dataset = datasets.load_dataset(
+              'ag_news',
+              split=mode if mode != 'validation' else 'test',  # ag_news δεν έχει validation split
+              cache_dir=cache_dir,
+              streaming=True,
+              revision=revision)
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          split_mode = mode if mode != 'validation' else 'test'  # ag_news δεν έχει validation split
+          dataset = datasets.load_dataset(
+              'ag_news',
+              split=f'{split_mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else split_mode,
+              cache_dir=cache_dir,
+              streaming=streaming,
+              revision=revision)
   else:
-    dataset = datasets.load_dataset(
-      dataset_name,
-      split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
-      cache_dir=cache_dir,
-      streaming=streaming,
-      trust_remote_code=True,
-      revision=revision)
+      if use_streaming and max_samples[mode] is not None:
+          stream_dataset = datasets.load_dataset(
+              dataset_name,
+              split=mode,
+              cache_dir=cache_dir,
+              streaming=True,
+              trust_remote_code=True,
+              revision=revision)
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+      else:
+          dataset = datasets.load_dataset(
+              dataset_name,
+              split=f'{mode}[:{max_samples[mode]}]' if max_samples[mode] is not None else mode,
+              cache_dir=cache_dir,
+              streaming=streaming,
+              trust_remote_code=True,
+              revision=revision)
+
+  data = dataset
 
   #if dataset_name in ['lambada', 'openwebtext-train',
   #                    'openwebtext-valid']:
@@ -453,7 +587,6 @@ def get_dataset(
   #else:
     #data = dataset[mode]
 
-  data = dataset
 
   if dataset_name.startswith('wikitext'):
     detokenizer = wt_detokenizer
