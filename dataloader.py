@@ -286,7 +286,12 @@ def get_text8_dataset(cache_dir, max_seq_length=256,
   return dataset
 
 
-def get_streaming_samples(dataset, max_samples_count):
+def get_streaming_samples(dataset, max_samples_count, dataset_name="unknown"):
+    print(f"\n{'='*60}")
+    print(f"GET_STREAMING_SAMPLES DEBUG: {dataset_name}")
+    print(f"  Requested: {max_samples_count} samples")
+    print(f"  Input type: {type(dataset)}")
+
     """Παίρνει N samples από streaming dataset"""
     if max_samples_count is None:
         return dataset
@@ -306,6 +311,9 @@ def get_streaming_samples(dataset, max_samples_count):
         samples.append(example)
     
     # ΣΗΜΑΝΤΙΚΟ: Μετατροπή σε REGULAR Dataset
+
+    print(f"  Returning dataset with {len(samples)} samples")
+    print('='*60)
     return Dataset.from_list(samples)  # Αυτό έχει __len__ από μόνο του
 
 
@@ -398,7 +406,7 @@ def get_dataset(
               revision=revision,
               streaming=True
           )
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               'wikitext',
@@ -416,7 +424,7 @@ def get_dataset(
               revision=revision,
               streaming=True
           )
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               'wikitext',
@@ -433,7 +441,7 @@ def get_dataset(
               revision=revision,
               streaming=True
           )
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               'ptb_text_only',
@@ -464,7 +472,7 @@ def get_dataset(
               streaming=True,  # ΠΑΝΤΑ streaming για samples περιορισμό
               trust_remote_code=True
           )
-          dataset = get_streaming_samples(stream_dataset, max_samples["train"])
+          dataset = get_streaming_samples(stream_dataset, max_samples["train"], dataset_name=dataset_name)
       else:
           # Αν δεν έχουμε max_samples, χρησιμοποιούμε το slice όπως πριν
           dataset = datasets.load_dataset(
@@ -501,7 +509,7 @@ def get_dataset(
               dataset = Dataset.from_list(val_samples)
           else:
               # Παίρνουμε απλά τα τελευταία N samples
-              dataset = get_streaming_samples(stream_dataset, max_samples["validation"])
+              dataset = get_streaming_samples(stream_dataset, max_samples["validation"], dataset_name=dataset_name)
       else:
           # Αν δεν έχουμε max_samples, χρησιμοποιούμε το slice όπως πριν
           dataset = datasets.load_dataset(
@@ -520,7 +528,7 @@ def get_dataset(
               cache_dir=cache_dir,
               streaming=True,
               revision=revision)
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               'scientific_papers', 'arxiv',
@@ -538,7 +546,7 @@ def get_dataset(
               cache_dir=cache_dir,
               streaming=True,
               revision=revision)
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               'scientific_papers', 'pubmed',
@@ -556,7 +564,7 @@ def get_dataset(
               cache_dir=cache_dir,
               streaming=True,
               revision=revision)
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           split_mode = mode if mode != 'validation' else 'test'  # ag_news δεν έχει validation split
           dataset = datasets.load_dataset(
@@ -574,7 +582,7 @@ def get_dataset(
               streaming=True,
               trust_remote_code=True,
               revision=revision)
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode])
+          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               dataset_name,
