@@ -288,18 +288,25 @@ def get_text8_dataset(cache_dir, max_seq_length=256,
 
 def get_streaming_samples(dataset, max_samples_count):
     """Παίρνει N samples από streaming dataset"""
-    print(f"###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\nmax_samples_count={max_samples_count}\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
     if max_samples_count is None:
         return dataset
+    
+    # Αν το dataset έχει ήδη length, απλά κόψε το
+    if hasattr(dataset, '__len__'):
+        if len(dataset) <= max_samples_count:
+            return dataset
+        else:
+            return dataset.select(range(max_samples_count))
+    
+    # Για streaming dataset: συλλογή samples
     samples = []
     for i, example in enumerate(dataset):
         if i >= max_samples_count:
             break
         samples.append(example)
     
-    # Μετατροπή σε regular Dataset
-    return Dataset.from_list(samples)
-
+    # ΣΗΜΑΝΤΙΚΟ: Μετατροπή σε REGULAR Dataset
+    return Dataset.from_list(samples)  # Αυτό έχει __len__ από μόνο του
 
 
 def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
