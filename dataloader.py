@@ -288,6 +288,7 @@ def get_text8_dataset(cache_dir, max_seq_length=256,
 
 def get_streaming_samples(dataset, max_samples_count):
     """Παίρνει N samples από streaming dataset"""
+    print(f"###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\nmax_samples_count={max_samples_count}\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
     if max_samples_count is None:
         return dataset
     samples = []
@@ -545,7 +546,9 @@ def get_dataset(
               streaming=streaming,
               revision=revision)
   elif dataset_name == 'ag_news':
+      print(f"use_streaming = {use_streaming}\nmax_samples= {max_samples}")
       if use_streaming and max_samples[mode] is not None:
+          print("\###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\nUsing streaming for ag_news.\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
           stream_dataset = datasets.load_dataset(
               'ag_news',
               split=mode if mode != 'validation' else 'test',  # ag_news δεν έχει validation split
