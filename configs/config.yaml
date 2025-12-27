@@ -74,7 +74,7 @@ trainer:
   gradient_clip_val: 1.0
   precision: 'bf16'
   num_sanity_val_steps: 2
-  max_steps: 400 # THIS WAS CHANGED FOR SMALLER DATASET (used to be 1_000_000)
+  max_steps: 300 # THIS WAS CHANGED FOR SMALLER DATASET (used to be 1_000_000)
   log_every_n_steps: 1_000
   limit_train_batches: 1.0   # train on full dataset, can be used to toggle quick run
   limit_val_batches: 1.0     # validate on full dataset, can be used to toggle quick run

@@ -373,12 +373,7 @@ def get_dataset(
     "validation": max_valid_samples,
     "test": max_test_samples
   }
-  #print("--------------------------------------------------------------------------------------------------------------------------------------------------------")
-  #print(f"max samples = {max_samples}\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
-  #print(f"dataset name = {dataset_name}\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
-  #print(f"mode = {mode}\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
-  #print("--------------------------------------------------------------------------------------------------------------------------------------------------------")
-  
+
   if dataset_name == 'openwebtext':
     if mode == 'train':
       dataset_name = 'openwebtext-train'
@@ -555,7 +550,6 @@ def get_dataset(
   elif dataset_name == 'ag_news':
       print(f"use_streaming = {use_streaming}\nmax_samples= {max_samples}")
       if use_streaming and max_samples[mode] is not None:
-          print("###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\nUsing streaming for ag_news.\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
           stream_dataset = datasets.load_dataset(
               'ag_news',
               split=mode if mode != 'validation' else 'test',  # ag_news δεν έχει validation split
@@ -773,7 +767,6 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   if skip_train:
     train_set = None
   else:
-    print(f"Training:\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\nstreaming={config.data.streaming}\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$")
     train_set = get_dataset(
       config,
       config.data.train,
@@ -794,7 +787,6 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   if skip_valid:
     valid_set = None
   else:
-    print(f"Validation:\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\nstreaming={config.data.streaming}\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$")
     valid_set = get_dataset(
       config,
       config.data.valid,
