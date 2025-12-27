@@ -748,6 +748,7 @@ def get_tokenizer(config):
 def get_dataloaders(config, tokenizer, skip_train=False,
                     skip_valid=False, valid_seed=None):
   num_gpus = torch.cuda.device_count()
+  print(f"&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\n&&&\nnum_gpus = {num_gpus} and accumulate_grad_batches = {config.trainer.accumulate_grad_batches}")
   if config.trainer.accumulate_grad_batches > 1:
     assert (config.loader.global_batch_size
             == (config.loader.batch_size
