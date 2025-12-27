@@ -548,7 +548,7 @@ def get_dataset(
   elif dataset_name == 'ag_news':
       print(f"use_streaming = {use_streaming}\nmax_samples= {max_samples}")
       if use_streaming and max_samples[mode] is not None:
-          print("\###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\nUsing streaming for ag_news.\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
+          print("###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\nUsing streaming for ag_news.\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###\n###")
           stream_dataset = datasets.load_dataset(
               'ag_news',
               split=mode if mode != 'validation' else 'test',  # ag_news δεν έχει validation split
