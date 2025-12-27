@@ -773,6 +773,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   if skip_train:
     train_set = None
   else:
+    print(f"Training:\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\nstreaming={config.data.streaming}\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$")
     train_set = get_dataset(
       config,
       config.data.train,
@@ -793,6 +794,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   if skip_valid:
     valid_set = None
   else:
+    print(f"Validation:\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\nstreaming={config.data.streaming}\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$\n$$$")
     valid_set = get_dataset(
       config,
       config.data.valid,
