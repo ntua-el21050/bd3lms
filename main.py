@@ -188,10 +188,15 @@ def _train(config, logger, tokenizer):
         config=config,
         strict=False)
     # add buffers for grid search
-    model.register_buffer('sampling_eps_min', torch.tensor(
-      config.training.sampling_eps_min))
-    model.register_buffer('sampling_eps_max', torch.tensor(
-      config.training.sampling_eps_max))
+    # Αντικατάσταση των γραμμών 190-193 με:
+    if not hasattr(model, 'sampling_eps_min'):
+        model.register_buffer('sampling_eps_min', torch.tensor(config.training.sampling_eps_min))
+    if not hasattr(model, 'sampling_eps_max'):
+        model.register_buffer('sampling_eps_max', torch.tensor(config.training.sampling_eps_max))
+    #model.register_buffer('sampling_eps_min', torch.tensor(
+    #  config.training.sampling_eps_min))
+    #model.register_buffer('sampling_eps_max', torch.tensor(
+    #  config.training.sampling_eps_max))
   else:
     logger.info(f'Initializing new model')
     model = diffusion.Diffusion(
