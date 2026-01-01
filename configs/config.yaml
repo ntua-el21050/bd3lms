@@ -47,6 +47,7 @@ training:
   resample: False
   sampling_eps_min: 1e-3
   sampling_eps_max: 1.0
+  nll_diagram: False
   from_pretrained: null
   eval_nll: True # always evaluate nll if block size is 1
 

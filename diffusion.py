@@ -1,4 +1,5 @@
 import itertools
+import os
 from dataclasses import dataclass
 
 import hydra.utils
@@ -112,6 +113,10 @@ class Diffusion(L.LightningModule):
     self.neg_infinity = -1000000.0
     self.fast_forward_epochs = None
     self.fast_forward_batches = None
+
+    self.nll_diagram = bool(getattr(self.config.training, 'nll_diagram', False))
+    self._nll_history_steps = []
+    self._nll_history_values = []
     self._validate_configuration()
 
   def _get_parameters(self):
@@ -359,12 +364,46 @@ class Diffusion(L.LightningModule):
     losses = self._loss(batch['input_ids'],
                         batch['attention_mask'])
     self.metrics.train_nlls.update(losses.nlls, losses.token_mask)
+
+    if self.nll_diagram and self.trainer is not None and self.trainer.is_global_zero:
+      self._nll_history_steps.append(int(self.trainer.global_step))
+      self._nll_history_values.append(float(losses.loss.detach().cpu()))
+
     self.log(name='trainer/loss',
              value=losses.loss.item(),
              on_step=True,
              on_epoch=False,
              sync_dist=True)
     return losses.loss
+
+  def on_train_end(self):
+    super().on_train_end()
+    if not self.nll_diagram:
+      return
+    if self.trainer is None or not self.trainer.is_global_zero:
+      return
+    if len(self._nll_history_steps) == 0:
+      return
+
+    try:
+      import matplotlib
+      matplotlib.use('Agg')
+      import matplotlib.pyplot as plt
+    except Exception as e:
+      raise RuntimeError(
+        'training.nll_diagram=True requires matplotlib. '
+        'Install it (e.g., pip install matplotlib) and re-run.') from e
+
+    out_path = os.path.join(os.getcwd(), 'nll_diagram.png')
+    plt.figure(figsize=(10, 5))
+    plt.plot(self._nll_history_steps, self._nll_history_values)
+    plt.xlabel('steps')
+    plt.ylabel('negative log likelihood')
+    plt.title('Training NLL vs Steps')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=200)
+    plt.close()
 
   def on_validation_epoch_start(self):
     self.metrics.reset()
