@@ -365,7 +365,12 @@ class Diffusion(L.LightningModule):
                         batch['attention_mask'])
     self.metrics.train_nlls.update(losses.nlls, losses.token_mask)
 
-    if self.nll_diagram and self.trainer is not None and self.trainer.is_global_zero:
+    if (
+      self.nll_diagram
+      and self.trainer is not None
+      and self.trainer.is_global_zero
+      and int(self.trainer.global_step) >= 2
+    ):
       self._nll_history_steps.append(int(self.trainer.global_step))
       self._nll_history_values.append(float(losses.loss.detach().cpu()))
 
