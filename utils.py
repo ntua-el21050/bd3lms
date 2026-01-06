@@ -22,8 +22,18 @@ def count_parameters(model):
 
 def fsspec_exists(filename):
   """Check if a file exists using fsspec."""
-  fs, _ = fsspec.core.url_to_fs(filename)
-  return fs.exists(filename)
+  try:
+    fs, _ = fsspec.core.url_to_fs(filename)
+    exists = fs.exists(filename)
+    if not exists:
+      # Fallback to os.path.exists for local paths (Google Drive in Colab)
+      import os
+      exists = os.path.exists(filename)
+    return exists
+  except Exception as e:
+    # If fsspec fails, try standard os.path.exists
+    import os
+    return os.path.exists(filename)
 
 
 def fsspec_listdir(dirname):

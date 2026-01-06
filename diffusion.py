@@ -186,6 +186,18 @@ class Diffusion(L.LightningModule):
     if 'sampling_eps_min' in checkpoint.keys():
       self.sampling_eps_min = checkpoint['sampling_eps_min']
       self.sampling_eps_max = checkpoint['sampling_eps_max']
+    
+    # Override sampling_eps in the checkpoint state_dict BEFORE Lightning loads it
+    # This is the only reliable way to change buffer values when resuming
+    if self.var_min and 'sampling_eps_min' in checkpoint['state_dict']:
+      checkpoint['state_dict']['sampling_eps_min'] = torch.tensor(
+        self.config.training.sampling_eps_min)
+      checkpoint['state_dict']['sampling_eps_max'] = torch.tensor(
+        self.config.training.sampling_eps_max)
+      print(f'✓ Overriding sampling_eps in checkpoint before load: '
+            f'min={self.config.training.sampling_eps_min}, '
+            f'max={self.config.training.sampling_eps_max}')
+    
     # Copied from:
     # https://github.com/Dao-AILab/flash-attention/blob/main/training/src/datamodules/language_modeling_hf.py#L41
     self.fast_forward_epochs = checkpoint['loops'][
