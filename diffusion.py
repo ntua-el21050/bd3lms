@@ -422,6 +422,27 @@ class Diffusion(L.LightningModule):
     plt.savefig(out_path, dpi=200)
     plt.close()
 
+    # Plot 2: only steps >= 1000
+    cutoff = 1000
+    steps_2 = []
+    values_2 = []
+    for s, v in zip(self._nll_history_steps, self._nll_history_values):
+      if s >= cutoff:
+        steps_2.append(s)
+        values_2.append(v)
+
+    if len(steps_2) > 0:
+      out_path_2 = os.path.join(os.getcwd(), f'nll_diagram_from_step_{cutoff}.png')
+      plt.figure(figsize=(10, 5))
+      plt.plot(steps_2, values_2)
+      plt.xlabel('Training Steps')
+      plt.ylabel('Negative Log Likelihood')
+      plt.title(f'Training NLL vs Training Steps (from step {cutoff})')
+      plt.grid(True, alpha=0.3)
+      plt.tight_layout()
+      plt.savefig(out_path_2, dpi=200)
+      plt.close()
+
   def on_validation_epoch_start(self):
     self.metrics.reset()
     if self.ema:
