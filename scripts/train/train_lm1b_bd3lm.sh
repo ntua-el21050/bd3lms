@@ -13,15 +13,16 @@
 #SBATCH --open-mode=append            # Do not overwrite logs
 #SBATCH --requeue                     # Requeue upon preemption
 
-BLOCK_SIZE=16
-PRETRAIN_CKPT=/share/kuleshov/ma2238/textdiffusion/checkpoints/lm1b_wrap_pretrain/checkpoints/61-850000.ckpt
+BLOCK_SIZE=4
+# PRETRAIN_CKPT=/share/kuleshov/ma2238/textdiffusion/checkpoints/lm1b_wrap_pretrain/checkpoints/61-850000.ckpt
+PRETRAIN_CKPT=null
 
-python -u main.py \
+python -u bd3lms/main.py \
     loader.global_batch_size=512 \
     loader.eval_global_batch_size=512 \
     loader.batch_size=64 \
     loader.eval_batch_size=64 \
-    model=small \
+    model=tiny \
     algo=bd3lm \
     algo.clip_search_widths=[0.5,0.6,0.7,0.8,0.9] \
     data=lm1b-wrap \
