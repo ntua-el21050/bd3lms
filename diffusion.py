@@ -51,6 +51,8 @@ class Diffusion(L.LightningModule):
     self.cross_attn = self.config.algo.cross_attn
     self.ignore_bos = self.config.algo.ignore_bos
     self.mdlm_loss_scale = self.config.algo.mdlm_loss_scale
+    self.reweight_loss = self.config.algo.reweight_loss
+    self.w_type = self.config.algo.w_type
     if (not hasattr(self.tokenizer, 'mask_token')
         or self.tokenizer.mask_token is None):
       self.mask_index = self.vocab_size
@@ -900,16 +902,22 @@ class Diffusion(L.LightningModule):
                          sampling_eps_min,
                          sampling_eps_max)
 
-    loss_scale, p = self.noise(t)
-    sigma = self._sigma_from_p(p[:,0].unsqueeze(-1))
-    dsigma = - loss_scale * torch.expm1(sigma) # used for sedd
+    loss_scale, p = self.noise(t) # a'_t/(1-a_t), p = 1 - a_t
+    sigma = self._sigma_from_p(p[:,0].unsqueeze(-1)) # ln(1/(1-p)) = ln(1/a_t)
+    dsigma = - loss_scale * torch.expm1(sigma) # used for sedd, dsigma = -a'_t/(1-a_t)*(1/a_t-1) = -a'_t/(1-a_t)*(1-a_t)/a_t = -a'_t/a_t
+    w = 1  # For not reweighted loss function
 
     # below is needed to reproduce mdlm/sedd numbers with models from sahoo et al
     # (numerical imprecision computing probs under loglinear schedule)
     if self.mdlm_loss_scale:
-      sigma, dsigma = self.noise.total_noise(t), self.noise.rate_noise(t)
-      p = 1 - torch.exp(-sigma)
-      loss_scale = - (dsigma / torch.expm1(sigma))
+      sigma, dsigma = self.noise.total_noise(t), self.noise.rate_noise(t) # sigma = -log(a_t)), dsigma = -a'_t/a_t
+      p = 1 - torch.exp(-sigma) # p = 1 - a_t
+      loss_scale = - (dsigma / torch.expm1(sigma)) # - (-a'_t/a_t)/(1/a_t-1) = (a'_t/a_t)/((1-a_t)/a_t) = a'_t/(1-a_t)
+
+    if self.reweight_loss:
+        a_t = 1 - p
+        da_t = -dsigma*a_t
+        w = self.noise._w(a_t, da_t, self.w_type)
 
     xt = self.q_xt(x0,
                    p,
@@ -931,11 +939,11 @@ class Diffusion(L.LightningModule):
       return dsigma * self._score_entropy(
         model_output, sigma, xt, x0)
 
-    log_p_theta = torch.gather(
+    log_p_theta = torch.gather( # get log prob of x0 given xt
       input=model_output,
       dim=-1,
       index=x0[:, :, None]).squeeze(-1)
-    loss = loss_scale * log_p_theta
+    loss = w * loss_scale * log_p_theta # multiply by loss scale = a'_t/(1-a_t)
     return loss
 
   def _loss(self, x0, attention_mask, t=None, sampling_eps_min=None, sampling_eps_max=None):

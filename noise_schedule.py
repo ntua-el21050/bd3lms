@@ -1,6 +1,8 @@
 import abc
 import torch
 import torch.nn as nn
+import numpy as np
+import math
 
 def get_noise(config, noise_type=None):
   if noise_type is None:
@@ -26,6 +28,26 @@ class Noise(abc.ABC, nn.Module):
   
   def forward(self, t):
     return self.compute_loss_scaling_and_move_chance(t)
+
+  def _w(self, a_t, da_t, w_type="simple", k = 0):
+    l = np.log(a_t/(1-a_t))
+    match w_type:
+      case "edm":
+        mu = 2.4
+        sigma = 2.4
+        return (1 / (math.sqrt(2 * math.pi * sigma**2))) * \
+           math.exp(-((l - mu)**2) / (2 * sigma**2)) * \
+           (np.exp(-l)+0.5**2) / (0.5**2)
+      case "iddpm":
+        return 1/(np.cosh(l/2))
+      case "sigmoid":
+        return 1/(1 + np.exp(-(-l+k)))
+      case "fm":
+        return np.exp(-l/2)
+      case "simple":
+        return -(1-a_t)/da_t
+      case _:
+        raise ValueError(f"Unknown w_type: {w_type}")
   
 class CosineNoise(Noise):
   def __init__(self, eps=1e-3):
