@@ -35,7 +35,7 @@ class Noise(abc.ABC, nn.Module):
       case "edm":
         mu = 2.4
         sigma = 2.4
-        return (1 / (torch.sqrt(2 * torch.pi * sigma**2))) * \
+        return (1 / (torch.sqrt(torch.tensor(2 * torch.pi * sigma**2)))) * \
            torch.exp(-((l - mu)**2) / (2 * sigma**2)) * \
            (torch.exp(-l)+0.5**2) / (0.5**2)
       case "iddpm":
