@@ -13,3 +13,5 @@ clip_search_widths: []
 fix_clipping: False
 sampler: analytic
 mdlm_loss_scale: False # set to true if using models from sahoo/lou et al
+reweight_loss: False
+w_type: 'simple'
