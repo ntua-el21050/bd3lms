@@ -353,6 +353,7 @@ def _group_texts(examples, block_size, bos, eos, insert_special_tokens=True):
 
 def get_dataset(
     cfg,
+    skip_train,
     dataset_name, tokenizer, wrap, mode, cache_dir,
     block_size=1024, num_proc=len(os.sched_getaffinity(0)),
     streaming=True, revision : Optional[str]=None, insert_eos=True, insert_special_tokens=True):
@@ -494,22 +495,21 @@ def get_dataset(
               trust_remote_code=True
           ) 
           # Παίρνουμε τα τελευταία N samples για validation
-          if max_samples["train"] is not None:
+          if not skip_train:
               # Αν έχουμε και train samples, παραλείπουμε αυτά πρώτα
               total_skip = max_samples["train"]
-              # Παίρνουμε validation samples μετά τα train
-              val_samples = []
-              for i, example in enumerate(stream_dataset):
-                  if i < total_skip:
-                      continue
-                  if len(val_samples) >= max_samples["validation"]:
-                      break
-                  val_samples.append(example)
-              from datasets import Dataset
-              dataset = Dataset.from_list(val_samples)
           else:
-              # Παίρνουμε απλά τα τελευταία N samples
-              dataset = get_streaming_samples(stream_dataset, max_samples["validation"], dataset_name=dataset_name)
+              total_skip = max_samples["train"] + max_samples["validation"]
+          # Παίρνουμε validation samples μετά τα train
+          val_samples = []
+          for i, example in enumerate(stream_dataset):
+            if i < total_skip:
+              continue
+            if len(val_samples) >= max_samples["validation"]:
+              break
+            val_samples.append(example)
+
+          dataset = Dataset.from_list(val_samples)
       else:
           # Αν δεν έχουμε max_samples, χρησιμοποιούμε το slice όπως πριν
           dataset = datasets.load_dataset(
@@ -582,7 +582,19 @@ def get_dataset(
               streaming=True,
               trust_remote_code=True,
               revision=revision)
-          dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
+          if skip_train:
+             total_skip = max_samples["validation"]
+             val_samples = []
+             for i, example in enumerate(stream_dataset):
+                 if i < total_skip:
+                     continue
+                 if len(val_samples) >= max_samples["validation"]:
+                      break
+                 val_samples.append(example)
+
+             dataset = Dataset.from_list(val_samples)
+          else:
+             dataset = get_streaming_samples(stream_dataset, max_samples[mode], dataset_name=dataset_name)
       else:
           dataset = datasets.load_dataset(
               dataset_name,
@@ -777,6 +789,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   else:
     train_set = get_dataset(
       config,
+      skip_train,
       config.data.train,
       tokenizer,
       mode='train',
@@ -797,6 +810,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
   else:
     valid_set = get_dataset(
       config,
+      skip_train,
       config.data.valid,
       tokenizer,
       wrap=config.data.wrap,
