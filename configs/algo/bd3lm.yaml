@@ -13,3 +13,5 @@ clip_search_widths: []
 fix_clipping: False
 sampler: semi_ar
 mdlm_loss_scale: False
+reweight_loss: False
+w_type: 'simple'

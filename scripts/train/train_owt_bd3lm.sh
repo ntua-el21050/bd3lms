@@ -13,18 +13,19 @@
 #SBATCH --open-mode=append            # Do not overwrite logs
 #SBATCH --requeue                     # Requeue upon preemption
 
-BLOCK_SIZE=16
-PRETRAIN_CKPT=kuleshov-group/bd3lm-owt-block_size1024-pretrain # to train from scratch, set to null
+BLOCK_SIZE=4
+# PRETRAIN_CKPT=kuleshov-group/bd3lm-owt-block_size1024-pretrain # to train from scratch, set to null
+PRETRAIN_CKPT=null
 
-python -u main.py \
+python -u bd3lms/main.py \
     loader.global_batch_size=512 \
     loader.eval_global_batch_size=512 \
     loader.batch_size=16 \
     loader.eval_batch_size=16 \
-    model=small \
+    model=tiny \
     algo=bd3lm \
     algo.clip_search_widths=[0.5,0.6,0.7,0.8,0.9] \
-    data=openwebtext-split \
+    data=openwebtext-streaming \
     data.insert_train_special=False \
     data.insert_valid_special=False \
     data.insert_valid_eos=False \
