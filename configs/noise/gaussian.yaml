@@ -1,0 +1,9 @@
+type: gaussian
+# Target distribution for move_chance p (mask probability):
+# truncated Normal(mu, sigma) on [0, 1]
+mu: 0.5
+sigma: 0.1
+
+# Numerical safety clamps
+p_min: 1e-5   # clamps p into [p_min, 1 - p_min]
+u_eps: 1e-6   # clamps u=t into [u_eps, 1 - u_eps]
