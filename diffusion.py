@@ -369,12 +369,18 @@ class Diffusion(L.LightningModule):
   def on_train_epoch_start(self):
     self.backbone.train()
     self.noise.train()
+    if hasattr(self.noise, 'set_training_progress') and self.trainer is not None:
+      max_steps = getattr(self.trainer, 'max_steps', None) or getattr(self.config.trainer, 'max_steps', None)
+      self.noise.set_training_progress(int(self.trainer.global_step), int(max_steps) if max_steps else 0)
     self.metrics.reset()
     assert self.metrics.train_nlls.nll.mean_value == 0
     assert self.metrics.train_nlls.nll.weight == 0
 
   def training_step(self, batch, batch_idx):
     del batch_idx
+    if hasattr(self.noise, 'set_training_progress') and self.trainer is not None:
+      max_steps = getattr(self.trainer, 'max_steps', None) or getattr(self.config.trainer, 'max_steps', None)
+      self.noise.set_training_progress(int(self.trainer.global_step), int(max_steps) if max_steps else 0)
     losses = self._loss(batch['input_ids'],
                         batch['attention_mask'])
     self.metrics.train_nlls.update(losses.nlls, losses.token_mask)
@@ -454,6 +460,9 @@ class Diffusion(L.LightningModule):
       self.ema.copy_to(itertools.chain(
         self.backbone.parameters(),
         self.noise.parameters()))
+    if hasattr(self.noise, 'set_training_progress') and self.trainer is not None:
+      max_steps = getattr(self.trainer, 'max_steps', None) or getattr(self.config.trainer, 'max_steps', None)
+      self.noise.set_training_progress(int(self.trainer.global_step), int(max_steps) if max_steps else 0)
     self.eval()
     self.backbone.eval()
     self.noise.eval()

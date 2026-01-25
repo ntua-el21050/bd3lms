@@ -1,0 +1,20 @@
+type: bimodal_gaussian
+
+# Mixture weights
+w1: 0.7
+
+# Component 1: N(mu1, sigma1^2)
+mu1: 0.15
+sigma1: 0.02
+
+# Component 2: N(mu2(tau), sigma2^2)
+# mu2(tau) = m_start + (m_end - m_start) * (1 - exp(-tau))
+# tau = tau_scale * global_step / max_steps
+sigma2: 0.08
+m_start: 0.4
+m_end: 0.85
+tau_scale: 3.0
+
+# Numerical safety clamps
+p_min: 1e-5
+u_eps: 1e-6
