@@ -73,6 +73,9 @@ trainer:
   devices: ${device_count:}
   accumulate_grad_batches: ${div_up:${loader.global_batch_size}, ${eval:${trainer.devices} * ${loader.batch_size} * ${trainer.num_nodes}}}
   gradient_clip_val: 1.0
+  # Workaround for occasional Lightning/TQDM progress bar crashes during
+  # validation with iterable/streaming dataloaders. Override to true if desired.
+  enable_progress_bar: false
   precision: 'bf16'
   num_sanity_val_steps: 2
   max_steps: 300 # THIS WAS CHANGED FOR SMALLER DATASET (used to be 1_000_000)
