@@ -788,7 +788,14 @@ class Diffusion(L.LightningModule):
     return self.tokenizer.batch_decode(samples)
 
   def _sigma_from_p(self, p):
-    return torch.min(- torch.log(1 - p), self.noise.sigma_max)
+    # `self.noise.sigma_max` can be a Python float (e.g. inf) or a Tensor/buffer,
+    # depending on the noise schedule implementation.
+    sigma = -torch.log1p(-p)
+    sigma_max = getattr(self.noise, 'sigma_max', float('inf'))
+    if torch.is_tensor(sigma_max):
+      sigma_max = sigma_max.to(device=sigma.device, dtype=sigma.dtype)
+      return torch.minimum(sigma, sigma_max)
+    return torch.clamp(sigma, max=float(sigma_max))
 
   def restore_model_and_sample(self, num_steps, eps=1e-5, seqlen=None):
     """Generate samples from the model."""
