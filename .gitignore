@@ -9,7 +9,8 @@ wandb/
 watch_folder/
 notes.md
 run.sh
-
+tt*
+fork*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

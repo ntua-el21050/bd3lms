@@ -801,7 +801,7 @@ def get_dataloaders(config, tokenizer, skip_train=False,
       streaming=config.data.streaming,
       revision=config.data.get("train_revision", None))
   
-  if config.data.valid in ['text8', 'jdeschena/lm1b', 'ag_news']:
+  if config.data.valid in ['text8', 'jdeschena/lm1b', 'ag_news', 'lm1b']:
     validation_split = 'test'
   else:
     validation_split = 'validation'
