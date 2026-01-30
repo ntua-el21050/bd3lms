@@ -182,7 +182,177 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 
     \subsection{Reproduction}
 
+    % ---------------- Reproduction Tables ----------------
+    
+    \begin{frame}{AR vs BD3LM with L'=1}
+    
+    % ---------- ROW 1 ----------
+    \begin{minipage}{\textwidth}
+        \begin{minipage}{0.45\textwidth}
+            \centering
+            \begin{table}
+                \small
+                \centering
+                Test Perplexities for single token generation
+                
+                \vspace{0.2cm}
+                \ra{1.2} 
+                \setlength{\tabcolsep}{0.2pt}
+                
+                \begin{tabular}{lc}
+                    \toprule
+                      & PPL ($\downarrow$) \\
+                    \midrule
+                    $\textbf{Autoregressive}$ & \textbf{1893}\\
+                    \midrule
+                    $\text{\textbf{BD3LM} L'=1}$ & 2231\\
+                    \midrule
+                    $\text{\textbf{BD3LM} L'=1 + Tuned Schedule}$ & 2220\\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.47\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{fig1.png}
+            
+            \small AR
+        \end{minipage}
+    \end{minipage}
+    
+    \vspace{0.5cm}
+    
+    % ---------- ROW 2 ----------
+    \begin{minipage}{\textwidth}
+        \centering
+        \begin{minipage}{0.47\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{fig2.png}
+            
+            \small BD3LM
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.47\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{fig3.png}
+            
+            \small BD3LM + Tuned Schedule
+        \end{minipage}
+    \end{minipage}
+    
+    \end{frame}
+    
+    
+    \begin{frame}{The Effect of Clipped Noise Schedules}
+        \begin{table}
+        \centering
+        \small
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.1}
+        
+        \begin{tabular}{lcccc}
+        \toprule
+         & \multicolumn{2}{c}{U [0, 0.5]} & \multicolumn{2}{c}{U [0, 1]} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+        L' & PPL & Var. NELBO & PPL & Var. NELBO \\
+        \midrule
+        128 & 1000 & 1000 & 1000 & 1000 \\
+        \bottomrule
+        \end{tabular}
+        \end{table}
+
+        \begin{table}
+        \centering
+        \small
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.1}
+        
+        \begin{tabular}{lcccc}
+        \toprule
+         & \multicolumn{2}{c}{U [0.3, 0.8]} & \multicolumn{2}{c}{U [0, 1]} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+        L' & PPL & Var. NELBO & PPL & Var. NELBO \\
+        \midrule
+        16 & 1000 & 1000 & 1000 & 1000 \\
+        \bottomrule
+        \end{tabular}
+        \end{table}
+        
+        \begin{table}
+        \centering
+        \small
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.1}
+        
+        \begin{tabular}{lcccc}
+        \toprule
+         & \multicolumn{2}{c}{U [0.5, 1]} & \multicolumn{2}{c}{U [0, 1]} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+        L' & PPL & Var. NELBO & PPL & Var. NELBO \\
+        \midrule
+        4 & 1226.46 & 44.41 & \textbf{1225.99} & \textbf{44.41} \\
+        \bottomrule
+        \end{tabular}
+        \end{table}
+        
+
+        
+    \end{frame}
+    
+    \begin{frame}{Table 3}
+        \centering
+        \Large Table 3 Results
+    \end{frame}
+    
+    \begin{frame}{Table 4}
+        \centering
+        \Large Table 4 Results
+    \end{frame}
+    
+    \begin{frame}{Table 5}
+        \centering
+        \Large Table 5 Results
+    \end{frame}
+    
+    \begin{frame}{Table 6}
+        \centering
+        \Large Table 6 Results
+    \end{frame}
+    
+    \begin{frame}{Table 7}
+        \centering
+        \Large Table 7 Results
+    \end{frame}
+    
+    \begin{frame}{Table 8}
+        \centering
+        \Large Table 8 Results
+    \end{frame}
+
+
     \subsection{Extensions}
+
+    % ---------------- New Extension Slides ----------------
+
+    \begin{frame}{Exploring New Schedules}
+        \begin{itemize}
+            \item Motivation for designing alternative noise schedules
+            \item Trade-off between stability and generation quality
+            \item Impact on gradient variance
+            \item Compatibility with block diffusion framework
+        \end{itemize}
+    \end{frame}
+    
+    \begin{frame}{New Schedules' Results}
+        \begin{itemize}
+            \item Comparison with cosine and clipped schedules
+            \item Effects on perplexity
+            \item Training stability observations
+            \item Sampling behavior differences
+        \end{itemize}
+    \end{frame}
+    
 
     \begin{frame}{Reweighted Losses for Improved Diffusion Objective}
         \begin{figure}
