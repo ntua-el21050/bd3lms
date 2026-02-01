@@ -246,58 +246,26 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
     
     \begin{frame}{The Effect of Clipped Noise Schedules}
         \begin{table}
-        \centering
-        \small
-        \setlength{\tabcolsep}{4pt}
-        \renewcommand{\arraystretch}{1.1}
-        
-        \begin{tabular}{lcccc}
-        \toprule
-         & \multicolumn{2}{c}{U [0, 0.5]} & \multicolumn{2}{c}{U [0, 1]} \\
-        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-        L' & PPL & Var. NELBO & PPL & Var. NELBO \\
-        \midrule
-        128 & 1000 & 1000 & 1000 & 1000 \\
-        \bottomrule
-        \end{tabular}
-        \end{table}
+            \centering
+            \small
+            \setlength{\tabcolsep}{6pt}
+            \renewcommand{\arraystretch}{1.1}
 
-        \begin{table}
-        \centering
-        \small
-        \setlength{\tabcolsep}{4pt}
-        \renewcommand{\arraystretch}{1.1}
-        
-        \begin{tabular}{lcccc}
-        \toprule
-         & \multicolumn{2}{c}{U [0.3, 0.8]} & \multicolumn{2}{c}{U [0, 1]} \\
-        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-        L' & PPL & Var. NELBO & PPL & Var. NELBO \\
-        \midrule
-        16 & 1000 & 1000 & 1000 & 1000 \\
-        \bottomrule
-        \end{tabular}
+            \begin{tabular}{l l c c}
+                \toprule
+                L' & Clipping & PPL & Var.\ NELBO \\
+                \midrule
+                \multirow{2}{*}{128} & U [0, 0.5] & 1000 & 1000 \\
+                                     & U [0, 1]   & 1000 & 1000 \\
+                \midrule
+                \multirow{2}{*}{16}  & U [0.3, 0.8] & 1000 & 1000 \\
+                                     & U [0, 1]     & 1000 & 1000 \\
+                \midrule
+                \multirow{2}{*}{4}   & U [0.5, 1] & 1226.46 & 44.41 \\
+                                     & U [0, 1]   & 1225.99 & 44.41 \\
+                \bottomrule
+            \end{tabular}
         \end{table}
-        
-        \begin{table}
-        \centering
-        \small
-        \setlength{\tabcolsep}{4pt}
-        \renewcommand{\arraystretch}{1.1}
-        
-        \begin{tabular}{lcccc}
-        \toprule
-         & \multicolumn{2}{c}{U [0.5, 1]} & \multicolumn{2}{c}{U [0, 1]} \\
-        \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-        L' & PPL & Var. NELBO & PPL & Var. NELBO \\
-        \midrule
-        4 & 1226.46 & 44.41 & \textbf{1225.99} & \textbf{44.41} \\
-        \bottomrule
-        \end{tabular}
-        \end{table}
-        
-
-        
     \end{frame}
     
     \begin{frame}{Table 3}
