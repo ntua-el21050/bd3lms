@@ -247,13 +247,13 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \renewcommand{\arraystretch}{1.1}
 
                     \begin{tabular}{l l c c}
-                        \toprule L'                   & Clipping     & PPL           & Var.\ NELBO    \\
-                        \midrule \multirow{2}{*}{128} & U [0, 0.5]   & 1000          & 10.00          \\
-                                                      & U [0, 1]     & 1000          & 10.00          \\
-                        \midrule \multirow{2}{*}{16}  & U [0.3, 0.8] & \textbf{1278} & \textbf{10.50} \\
-                                                      & U [0, 1]     & 1279          & 10.51          \\
-                        \midrule \multirow{2}{*}{4}   & U [0.5, 1]   & \textbf{1226} & \textbf{44.41} \\
-                                                      & U [0, 1]     & \textbf{1226} & \textbf{44.41} \\
+                        \toprule L'                   & Clipping                & PPL           & Var.\ NELBO    \\
+                        \midrule \multirow{2}{*}{128} & $\mathcal{U}[0, 0.5]$   & 1000          & 10.00          \\
+                                                      & $\mathcal{U}[0, 1]$     & 1000          & 10.00          \\
+                        \midrule \multirow{2}{*}{16}  & $\mathcal{U}[0.3, 0.8]$ & \textbf{1278} & \textbf{10.50} \\
+                                                      & $\mathcal{U}[0, 1]$     & 1279          & 10.51          \\
+                        \midrule \multirow{2}{*}{4}   & $\mathcal{U}[0.5, 1]$   & \textbf{1226} & \textbf{44.41} \\
+                                                      & $\mathcal{U}[0, 1]$     & \textbf{1226} & \textbf{44.41} \\
                         \bottomrule
                     \end{tabular}
                 \end{table}
@@ -672,15 +672,46 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
     \end{frame}
 
     \begin{frame}{New Schedules' Results}
-        \begin{itemize}
-            \item Comparison with cosine and clipped schedules
+        \tiny
+        \centering
+        \vspace{-0.3em}
+        % \textbf{Perplexities (PPL) and Var.\ NELBO for implemented vs new schedules}\par
+        \vspace{0.4em}
 
-            \item Effects on perplexity
+        \begin{table}
+            \caption{Perplexities (PPL) and Var.\ NELBO for implemented vs new schedules
+            on LM1B (400 Pretraining Steps + 100 Fine-tuning Steps). B.G. stands for Bimodal Gaussian}
+            \centering
+            \setlength{\tabcolsep}{2.0pt} % was 2.2pt (slightly tighter to fit extra rows)
+            \renewcommand{\arraystretch}{0.90} % was 0.95
 
-            \item Training stability observations
+            \resizebox{\textwidth}{!}{%
+            \begin{tabular}{c l c c | l c c}
+                \toprule \multirow{2}{*}{Block Size} & \multicolumn{3}{c|}{\textbf{Already Implemented}} & \multicolumn{3}{c}{\textbf{Newly Implemented}} \\
+                \cmidrule(lr){2-4}\cmidrule(lr){5-7} & Noise Schedule                                    & PPL                                           & Var.\ NELBO & Noise Schedule   & PPL  & Var.\ NELBO \\
+                \midrule
 
-            \item Sampling behavior differences
-        \end{itemize}
+\multirow{4}{*}{128}       & Loglinear                                                                   & 1000                                          & 10.00       & Gaussian ($\mu=$0.5)           & 1000 & 10.00       \\
+                                                     & Loglinear $\mathcal{U}[0,\,0.5]$                  & 1000                                          & 10.00       & Gaussian ($\mu=$0.6)           & 1000 & 10.00       \\
+                                                     & Cosine                                            & 1000                                          & 10.00       & B.G. ($\mu_1=0.3, w_1=0.6$)    & 1000 & 10.00       \\
+                                                     & Cosine $\mathcal{U}[0,\,0.5]$                     & 1000                                          & 10.00       & B.G. ($\mu_1=0.1, w_1=0.6$)    & 1000 & 10.00       \\
+                \midrule
+
+\multirow{4}{*}{16}        & Loglinear                                                                   & 1279                                          & 10.50       & Gaussian ($\mu=$0.5)           & 1234 & 10.00       \\
+                                                     & Loglinear $\mathcal{U}[0.3,\,0.8]$                & 1278                                          & 10.51       & Gaussian ($\mu=$0.6)           & 1235 & 10.00       \\
+                                                     & Cosine                                            & 1236                                          & 10.00       & B.G. ($\mu_1=0.3, w_1=0.6$)    & 1254 & 10.00       \\
+                                                     & Cosine $\mathcal{U}[0.3,\,0.8]$                   & 1235                                          & 10.00       & B.G. ($\mu_1=0.1, w_1=0.6$)    & 1295 & 10.00       \\
+                \midrule
+
+\multirow{4}{*}{4}         & Loglinear                                                                   & 1226                                          & 44.41       & Gaussian ($\mu=$0.5)           & 1000 & 10.00       \\
+                                                     & Loglinear $\mathcal{U}[0.5,\,1]$                  & 1226                                          & 44.41       & Gaussian ($\mu=$0.6)           & 1000 & 10.00       \\
+                                                     & Cosine                                            & 1000                                          & 10.00       & B.G. ($\mu_1=0.3, w_1=0.6$)    & 1000 & 10.00       \\
+                                                     & Cosine $\mathcal{U}[0.5,\,1]$                     & 1000                                          & 10.00       & B.G. ($\mu_1=0.1, w_1=0.6$)    & 1000 & 10.00       \\
+                \bottomrule
+            \end{tabular}%
+            }
+        \end{table}
+        \vspace{-0.6em}
     \end{frame}
 
     \begin{frame}{Reweighted Losses for Improved Diffusion Objective}
