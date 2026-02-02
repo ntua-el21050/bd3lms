@@ -179,6 +179,9 @@ misc_internal/
 sample_logs/
 varlen_sample_logs/
 logs/
+
 final_presentation/*.nav
 final_presentation/*.out
 final_presentation/*.gz
+final_presentation/*.toc
+final_presentation/*.aux

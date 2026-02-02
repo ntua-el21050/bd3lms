@@ -66,15 +66,19 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 \AtBeginSubsection[]{ \begin{frame}\frametitle{Table of Contents} \tableofcontents[currentsection,currentsubsection]\end{frame} }
 
 \begin{document}
+	% Slide 1
     \frame{\titlepage}
 
+	% Slide 2
     \begin{frame}
         \frametitle{Table of Contents}
         \tableofcontents
     \end{frame}
 
+	% Slide 3
     \section{Paper Overview}
 
+	% Slide 4
     \begin{frame}{Introduction to the Problem-Motivation}
         \textbf{Two main approaches for Language Models:}
 
@@ -169,12 +173,15 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{itemize}
     \end{frame}
 
+	% Slide 6
     \section{Our Results}
 
+	% Slide 7
     \subsection{Reproduction}
 
     % ---------------- Reproduction Tables ----------------
 
+	% Slide 8
     \begin{frame}{AR vs BD3LM with L'=1}
         % ---------- ROW 1 ----------
         \begin{minipage}{\textwidth}
@@ -208,7 +215,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{minipage}
         \end{minipage}
 
-        \vspace{0.5cm}
+        \vspace{0.1cm}
 
         % ---------- ROW 2 ----------
         \begin{minipage}{\textwidth}
@@ -229,6 +236,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{minipage}
     \end{frame}
 
+	% Slide 9
     \begin{frame}{The Effect of Clipped Noise Schedules}
         \footnotesize
 
@@ -280,6 +288,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{columns}
     \end{frame}
 
+	% Slide 10
     \begin{frame}{BD3LMs vs ARs vs Diffusion Models on LM1B}
         \footnotesize
 
@@ -334,6 +343,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{columns}
     \end{frame}
 
+	% Slide 11
     \begin{frame}{BD3LMs vs ARs vs Diffusion Models on OWT}
         \footnotesize
 
@@ -388,6 +398,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{columns}
     \end{frame}
 
+	% Slide 12
     \begin{frame}{Performance on other Datasets}
         \centering
         \footnotesize
@@ -428,6 +439,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{block}
     \end{frame}
 
+	% Slide 13
     \begin{frame}{Variable-Length Sequence Generation}
         \centering
         \footnotesize % shrink the whole slide (matches the style used elsewhere)
@@ -470,8 +482,10 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{block}
     \end{frame}
 
+	% Slide 14
     \begin{frame}{Sample Quality}
         \centering
+        \footnotesize
         \begin{table}[t]
             \centering
             \caption{Generative Perplexity (Gen.PPL;↓) and number of Function
@@ -496,6 +510,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{table}
     \end{frame}
 
+	% Slide 15
     \begin{frame}{Effect of Different Noise Schedules}
         \centering
         \scriptsize % smaller than footnotesize to help height fit
@@ -556,9 +571,11 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{column}
         \end{columns}
     \end{frame}
-
+	
+	% Slide 16
     \subsection{Extensions}
 
+	% Slide 17
     \begin{frame}{Noise Scheduling in Masked Diffusion (Summary)}
         \small \textbf{Continuous time index:}
         \[
@@ -595,6 +612,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{block}
     \end{frame}
 
+	% Slide 18
     \begin{frame}{Already Implemented Noise Schedules}
         \footnotesize
         \centering
@@ -615,6 +633,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{table}
     \end{frame}
 
+	% Slide 19
     \begin{frame}{Gaussian \& Bimodal Gaussian Noise Schedules}
         \scriptsize \textbf{Goal:} sample a masked probability $p(t)\in(0,1)$
         from $t\sim\mathcal{U}[0,1]$.
@@ -659,6 +678,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \]
     \end{frame}
 
+	% Slide 20
     \begin{frame}{New Schedules' Results}
         \tiny
         \centering
@@ -702,6 +722,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \vspace{-0.6em}
     \end{frame}
 
+	% Slide 21
     \begin{frame}{Reweighted Losses for Improved Diffusion Objective}
         \begin{figure}
             \centering
@@ -709,6 +730,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{figure}
     \end{frame}
 
+	% Slide 22
     \begin{frame}{Reweighted Losses for Masked Diffusion}
         \begin{itemize}
             \item Initial Reweighted NELBO:
@@ -745,6 +767,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{table}
     \end{frame}
 
+	% Slide 23
     \begin{frame}{Reweighted Losses Results}
         \begin{table}
             \small
@@ -772,9 +795,12 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \end{table}
     \end{frame}
 
+	% Slide 24
     \section{Conclusion \& Future Work}
 
+	% Slide 25
     \section{Team Organization}
 
+	% Slide 26
     \section{Retrospection}
 \end{document}
