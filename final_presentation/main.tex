@@ -710,22 +710,22 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \cmidrule(lr){2-4}\cmidrule(lr){5-7} & Noise Schedule                                    & PPL                                           & Var.\ NELBO    & Noise Schedule                  & PPL  & Var.\ NELBO \\
                 \midrule
 
-\multirow{4}{*}{128}                                 & Loglinear                                         & 1000                                          & 10.00          & Gaussian ($\mu=$0.5)            & 1000 & 10.00       \\
-                                                     & Loglinear $\mathcal{U}[0,\,0.5]$                  & 1000                                          & 10.00          & Gaussian ($\mu=$0.6)            & 1000 & 10.00       \\
-                                                     & Cosine                                            & 1000                                          & 10.00          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1000 & 10.00       \\
-                                                     & Cosine $\mathcal{U}[0,\,0.5]$                     & 1000                                          & 10.00          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1000 & 10.00       \\
+\multirow{4}{*}{128}                                 & Loglinear                                         & 1000                                          & 10.00          & Gaussian ($\mu=$0.5)            & 1000 & 10.00                          \\
+                                                     & Loglinear $\mathcal{U}[0,\,0.5]$                  & 1000                                          & 10.00          & Gaussian ($\mu=$0.6)            & 1000 & 10.00                          \\
+                                                     & Cosine                                            & 1000                                          & 10.00          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1000 & 10.00                          \\
+                                                     & Cosine $\mathcal{U}[0,\,0.5]$                     & 1000                                          & 10.00          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1000 & 10.00                          \\
                 \midrule
 
-\multirow{4}{*}{16}                                  & Loglinear                                         & 1279                                          & 10.50          & Gaussian ($\mu=$0.5)            & 1234 & 10.30       \\
-                                                     & Loglinear $\mathcal{U}[0.3,\,0.8]$                & 1278                                          & 10.51          & Gaussian ($\mu=$0.6)            & 1235 & 10.31       \\
-                                                     & Cosine                                            & 1236                                          & 10.29          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1254 & 10.42       \\
-                                                     & Cosine $\mathcal{U}[0.3,\,0.8]$                   & 1235                                          & 10.28          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1295 & 10.59       \\
-                \midrule
+\multirow{4}{*}{16}                                  & Loglinear                                         & 1279                                          & 10.50          & Gaussian ($\mu=$0.5)            & \textbf{1234} & \textbf{10.28}        \\
+                                                     & Loglinear $\mathcal{U}[0.3,\,0.8]$                & 1278                                          & 10.51          & Gaussian ($\mu=$0.6)            & 1235 & 10.31                          \\
+                                                     & Cosine                                            & 1236                                          & 10.30          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1254 & 10.42                          \\
+                                                     & Cosine $\mathcal{U}[0.3,\,0.8]$                   & 1235                                          & 10.29          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1295 & 10.59                          \\
+                \midrule                    
 
-\multirow{4}{*}{4}                                   & Loglinear                                         & \textbf{1226}                                 & \textbf{44.41} & Gaussian ($\mu=$0.5)            & 1250 & 46.76       \\
-                                                     & Loglinear $\mathcal{U}[0.5,\,1]$                  & \textbf{1226}                                 & \textbf{44.41} & Gaussian ($\mu=$0.7)            & 1252 & 46.76       \\
-                                                     & Cosine                                            & 1228                                          & 45.28          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1253 & 46.84       \\
-                                                     & Cosine $\mathcal{U}[0.5,\,1]$                     & 1229                                          & 45.26          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1243 & 46.49       \\
+\multirow{4}{*}{4}                                   & Loglinear                                         & \textbf{1226}                                 & \textbf{44.41} & Gaussian ($\mu=$0.5)            & 1250 & 46.76                          \\
+                                                     & Loglinear $\mathcal{U}[0.5,\,1]$                  & \textbf{1226}                                 & \textbf{44.41} & Gaussian ($\mu=$0.7)            & 1252 & 46.76                          \\
+                                                     & Cosine                                            & 1228                                          & 45.28          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1253 & 46.84                          \\
+                                                     & Cosine $\mathcal{U}[0.5,\,1]$                     & 1229                                          & 45.26          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1243 & 46.49                          \\
                 \bottomrule
             \end{tabular}%
             }
@@ -733,7 +733,43 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \vspace{-0.6em}
     \end{frame}
 
-	% Slide 21
+    \begin{frame}{Using Bimodal Gaussian on Pretraining}
+        \scriptsize
+        \centering
+
+        \footnotesize{
+        \parbox{0.95\linewidth}{
+        \textbf{We can also apply the Bimodal Gaussian noise schedule during pretraining.}\\
+        The table reports, for each pretraining noise schedule, the \emph{best} fine-tuning noise schedule we found, with the corresponding PPL and Var.\ NELBO (400 Pretraining Steps + 100 Fine-tuning Steps).}
+        }
+        \vspace{0.15cm}
+
+        \begin{table}
+            \centering
+            \setlength{\tabcolsep}{4pt}
+            \renewcommand{\arraystretch}{1.05}
+            \resizebox{\textwidth}{!}{%
+            \begin{tabular}{c l l r r}
+                \toprule
+                \textbf{Block Size} & \textbf{Pretraining Schedule} & \textbf{Fine-tuning Schedule} & \textbf{PPL} & \textbf{Var.\ NELBO} \\
+                \midrule
+                \multirow{2}{*}{128} & Loglinear        & ?????                           & 1000 & 10.00                   \\
+                                     & Bimodal Gaussian & ?????                           & 1000 & 10.00                   \\
+                \midrule
+                \multirow{2}{*}{16}  & Loglinear        & Gaussian ($\mu=0.5$)            & 1234 & 10.28                   \\
+                                     & Bimodal Gaussian & Cosine $\mathcal{U} [0.3,\,0.8]$ & \textbf{1227} & \textbf{10.22} \\
+                \midrule
+                \multirow{2}{*}{4}   & Loglinear        & Loglinear                       & 1226 & 44.41                   \\
+                                     & Bimodal Gaussian & Loglinear                       & \textbf{1213} & \textbf{44.39} \\
+                \bottomrule
+            \end{tabular}%
+            }
+        \end{table}
+    \end{frame}
+
+    % --- end new slide ---
+
+    % Slide 21
     \begin{frame}{Reweighted Losses for Improved Diffusion Objective}
         \begin{figure}
             \centering
