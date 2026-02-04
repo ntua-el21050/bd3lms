@@ -11,6 +11,12 @@ notes.md
 run.sh
 tt*
 fork*
+
+final_presentation/*
+!final_presentation/**/
+!final_presentation/main.tex
+!final_presentation/**/*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
