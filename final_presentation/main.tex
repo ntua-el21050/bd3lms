@@ -617,8 +617,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             The noise schedule sets \emph{where} the model learns via $p(t)$ (masking
             rate). When sampling $t \sim \mathcal{U}[0,1]$,
             $\text{loss\_scaling}(t)=\frac{a'(t)}{1-a(t)}$ acts as a weight on
-            the per-token log-likelihood term so the discrete estimator matches
-            the continuous-time integral/ELBO and balances low- vs high-noise regions.
+            the per-token log-likelihood term, stabilizing the training across different noise levels.
         \end{block}
     \end{frame}
 
