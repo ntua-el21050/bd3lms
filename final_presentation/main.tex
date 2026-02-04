@@ -517,7 +517,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 
         \begin{columns}[T,onlytextwidth]
             % ----- LEFT: existing table -----
-            \begin{column}{0.62\textwidth}
+            \begin{column}{0.6\textwidth}
                 \centering
                 \begin{table}[t]
                     \centering
@@ -533,18 +533,18 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                         \toprule Noise schedule                        & PPL            & Var.\ NELBO   \\
                         \midrule \multicolumn{3}{l}{\textbf{$L' = 4$}}  \\
                         Clipped                                        &                &               \\
-                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & \textbf{29.21} & \textbf{6.24} \\
-                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 29.38          & 10.33         \\
-                        Linear $\mathcal{U}[0,1]$                      & 30.18          & 23.45         \\
-                        Logarithmic                                    & 30.36          & 23.53         \\
-                        Square root                                    & 31.41          & 26.43         \\
+                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 1199.43 & \textbf{15.2313} \\
+                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 1101.03          & 27.6118         \\
+                        Linear $\mathcal{U}[0,1]$                      & 751.15          & 260.1035         \\
+                        Logarithmic                                    & 750.05          & 125.6219         \\
+                        Square root                                    & \textbf{718.90} & 83.832         \\
                         \midrule \multicolumn{3}{l}{\textbf{$L' = 16$}} \\
                         Clipped                                        &                &               \\
-                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 31.42          & 3.60          \\
-                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & \textbf{31.12} & \textbf{3.58} \\
-                        Linear $\mathcal{U}[0,1]$                      & 31.72          & 7.62          \\
-                        Square                                         & 31.43          & 13.03         \\
-                        Cosine                                         & 31.41          & 13.00         \\
+                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 1056.46   & \textbf{4.3476}         \\
+                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 797.62 & 6.4124 \\
+                        Linear $\mathcal{U}[0,1]$                      & 661.99          & 44.7271          \\
+                        Square                                         & \textbf{627.02}          & 27.5325         \\
+                        Cosine                                         & 633.59          & 20.8008         \\
                         \bottomrule
                     \end{tabular}%
                     }
@@ -553,20 +553,19 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 
             % ----- RIGHT: commentary placeholder (matching earlier slides) -----
             \begin{column}{0.38\textwidth}
-                \vspace{0.9cm}
-                \begin{block}{Commentary (placeholder)}
+                \vspace{0.1cm}
+                \begin{block}{Table 8 Reproduction}
                     \vspace{0.1cm}
                     \textbf{Key takeaways:}
                     \begin{itemize}
-                        \item \emph{???}
+                        \item \emph{Variance Hypothesis Confirmed:} Clipped schedules reduced NELBO variance by ~17x (from 260.1 to 15.2), validating the method's stability.
 
-                        \item \emph{???}
+                        \item \emph{Perplexity trade-off:} Unlike the paper, standard noise schedules achieve better PPL. Those noise schedules are probably easier to be learned faster but lack on convergence.
 
-                        \item \emph{???}
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{Conclusion...}
+                    \emph{The method effectively stabilizes training (low variance) immediately, but PPL gains from this stability likely require a longer training horizon}
                 \end{block}
             \end{column}
         \end{columns}
