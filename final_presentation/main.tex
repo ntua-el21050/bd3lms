@@ -337,8 +337,8 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \begin{column}{0.58\textwidth}
                 \centering
                 \parbox{0.8\linewidth}{
-                Test perplexities (PPL; $\downarrow$) of models on OWT. (800 Pretraining
-                Steps + 800 Fine-tuning Steps)}
+                Test perplexities (PPL; $\downarrow$) of models on OWT. (3000 Pretraining
+                Steps + 3000 Fine-tuning Steps)}
                 \vspace{0.2cm}
 
                 \begin{table}
@@ -367,13 +367,13 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \scriptsize
                     \textbf{Key takeaways:}
                     \begin{itemize}
-                        \item \emph{AR vs diffusion preserved:} In both original and reproduction, AR outperforms diffusion baselines (lower PPL).
+                        \item \emph{AR $>$ DIFF:} AR outperforms diffusion baselines (lower PPL).
 
-                        \item \emph{BD3LM vs AR flips:} Original ranks AR best overall (BD3LM worse than AR), while reproduction ranks BD3LM best (all BD3LM $<$ AR).
+                        \item \emph{BD3LM $>$ AR:} Reverse arrangement of models
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{Conclusion: diffusion-vs-AR relationships match the paper, but the global winner changes (AR in original vs BD3LM in reproduction), possibly exaggerated at this small scale.}
+                    \emph{Conclusion: Bd3-lms outperform AR small scale models with constrained resources.}
                 \end{block}
             \end{column}
         \end{columns}
