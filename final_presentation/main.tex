@@ -385,9 +385,8 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \footnotesize
 
         \parbox{0.95\linewidth}{\centering}
-        {Zero-shot validation perplexities ($\downarrow$) of models trained on OWT.}
-
-        % \vspace{0.25cm}
+        {Zero-shot validation perplexities ($\downarrow$) of models trained on OWT. (800 Pretraining
+        	Steps + 800 Fine-tuning Steps)}
 
         \begin{table}
             \centering
@@ -403,17 +402,18 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{tabular}%
         \end{table}
 
-        % \vspace{0.25cm}
+		\vspace*{-0.25cm}
 
         \begin{block}{Original vs Reproduction}
             \scriptsize
             \textbf{Key takeaways:}
             \begin{itemize}
-                \item \emph{Wikitext:} Original and reproduction both rank \textbf{AR best}, but original has \textbf{BD3LM} beating diffusion, while reproduction has \textbf{BD3LM worse} than both diffusion baselines.
+                \item \emph{Wikitext:} Original $\rightarrow$ AR $>$ \textbf{all} and \textbf{Bd3-lms} $>$ Diff \\ Reproduction $\rightarrow$ AR $>$ all, \textbf{Diff} $>$ Bd3-lms.
 
-                \item \emph{LM1B:} Original ranks \textbf{AR best} (BD3LM second), but reproduction ranks \textbf{BD3LM best}.
+                \item \emph{LM1B:} Reproduction \textbf{Bd3-lms} $>$ all.
 
-                \item \emph{Lambada:} Original ranks \textbf{diffusion best} (followed by BD3LM), while reproduction ranks \textbf{BD3LM best}.
+                \item \emph{Lambada:} Original $\rightarrow$ \textbf{Diff} $>$ all \\ Reproduction $\rightarrow$ \textbf{Bd3-lms} $>$ all
+                
             \end{itemize}
             \emph{Conclusion: Generally, the winner per dataset shifts between original and reproduction, consistent with small-model transfer being noisy.}
         \end{block}
