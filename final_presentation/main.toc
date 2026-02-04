@@ -2,6 +2,8 @@
 \beamer@sectionintoc {2}{Our Results}{6}{0}{2}
 \beamer@subsectionintoc {2}{1}{Reproduction}{7}{0}{2}
 \beamer@subsectionintoc {2}{2}{Extensions}{16}{0}{2}
-\beamer@sectionintoc {3}{Conclusion \& Future Work}{25}{0}{3}
-\beamer@sectionintoc {4}{Team Organization}{26}{0}{4}
-\beamer@sectionintoc {5}{Retrospection}{27}{0}{5}
+\beamer@subsubsectionintoc {2}{2}{1}{Alternative Noise Schedules}{17}{0}{2}
+\beamer@subsubsectionintoc {2}{2}{2}{Loss Reweighting in the NELBO Objective}{23}{0}{2}
+\beamer@sectionintoc {3}{Conclusion \& Future Work}{27}{0}{3}
+\beamer@sectionintoc {4}{Team Organization}{28}{0}{4}
+\beamer@sectionintoc {5}{Retrospection}{29}{0}{5}

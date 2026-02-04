@@ -65,6 +65,8 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 
 \AtBeginSubsection[]{ \begin{frame}\frametitle{Table of Contents} \tableofcontents[currentsection,currentsubsection]\end{frame} }
 
+\AtBeginSubsubsection[]{ \begin{frame}\frametitle{Table of Contents} \tableofcontents[currentsection,currentsubsection]\end{frame} }
+
 \begin{document}
 	% Slide 1
     \frame{\titlepage}
@@ -555,7 +557,9 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 	
 	% Slide 16
     \subsection{Extensions}
-
+	
+	\subsubsection{Alternative Noise Schedules}
+	
 	% Slide 17
     \begin{frame}{Noise Scheduling in Masked Diffusion (Summary)}
         \small \textbf{Continuous time index:}
@@ -749,6 +753,8 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
     \end{frame}
 
     % --- end new slide ---
+
+	\subsubsection{Loss Reweighting in the NELBO Objective}
 
     % Slide 21
     \begin{frame}{Reweighted Losses for Improved Diffusion Objective}
