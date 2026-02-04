@@ -467,33 +467,58 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \emph{Conclusion: reproduction preserves the ordering, but underestimates BD3LM’s max-length gain, likely missing long-tail samples at this scale.}
         \end{block}
     \end{frame}
-
-	% Slide 14
+    
+    % Slide 14
     \begin{frame}{Sample Quality}
-        \centering
-        \footnotesize
-        \begin{table}[t]
-            \centering
-            \caption{Generative Perplexity (Gen.PPL;↓) and number of Function
-            Evaluations (NFEs;↓) of 300 samples. All models are trained on OWT.
-            (?training steps?)}
-            \label{tab:gen_ppl_nfe}
-            \begin{tabular}{lrrrr}
-                \toprule                                                           & \multicolumn{2}{c}{$L = 1024$} & \multicolumn{2}{c}{$L = 2048$} \\
-                \cmidrule(lr){2-3}\cmidrule(lr){4-5} Model                         & Gen.\ PPL                      & NFEs                          & Gen.\ PPL      & NFEs \\
-                \midrule AR                                                        & 14.1                           & 1K                            & 13.2           & 2K   \\
-                \midrule \addlinespace \multicolumn{5}{l}{\textbf{Diffusion}}       \\
-                SEDD                                                               & 52.0                           & 1K                            & --             & --   \\
-                MDLM                                                               & 46.8                           & 1K                            & 41.3           & 2K   \\
-                \midrule \addlinespace \multicolumn{5}{l}{\textbf{Block Diffusion}} \\
-                SSD-LM $L' = 25$                                                   & 37.2                           & 40K                           & 35.3           & 80K  \\
-                \addlinespace \hspace{1em}281.3                                    & 1K                             & 281.9                         & 2K              \\ % (όπως φαίνεται στον πίνακα)
-                BD3-LMs $L' = 16$                                                  & 32.97                          & 1K                            & 31.42          & 2K   \\
-                \hspace{2em}$L' = 8$                                               & 29.35                          & 1K                            & 27.42          & 2K   \\
-                \hspace{2em}$L' = 4$                                               & \textbf{24.74}                 & 1K                            & \textbf{23.85} & 2K   \\
-                \bottomrule
-            \end{tabular}
-        \end{table}
+    	\centering
+    	\scriptsize % smaller than footnotesize to help height fit
+    	
+    	\begin{columns}[T,onlytextwidth]
+    		\begin{column}{0.6\textwidth}
+    			\raggedright
+    			\scriptsize
+    			
+    			Generative Perplexity (Gen.PPL;↓) and number of Function
+    			Evaluations (NFEs;↓) of 300 samples. All models are trained on WikiText2.
+    			(200 + 100 training steps)
+    			
+    			\vspace{0.2cm}
+    			
+    			\setlength{\tabcolsep}{5pt}
+    			\renewcommand{\arraystretch}{1.05}
+    			
+    			\begin{tabular}{@{}lcc@{}}
+    				\toprule
+    				Model & PPL & NFEs \\
+    				\midrule
+    				AR & 5 & 5 \\
+    				SEDD & 5 & 5 \\
+    				MDLM & 5 & 5 \\
+    				BD3-LM $L'=16$ & 5 & 5 \\
+    				BD3-LM $L'=8$ & 5 & 5 \\
+    				BD3-LM $L'=4$ & 5 & 5 \\
+    				\bottomrule
+    			\end{tabular}
+    		\end{column}
+    		
+    		
+    		\begin{column}{0.38\textwidth}
+    			\vspace{0.1cm}
+    			\begin{block}{Original vs Reproduction}
+    				\vspace{0.1cm}
+    				\textbf{Key takeaways:}
+    				\begin{itemize}
+    					\item \emph{Variance Hypothesis Confirmed:} Clipped schedules reduced NELBO variance by ~17x (from 260.1 to 15.2), validating the method's stability.
+    					
+    					\item \emph{Perplexity trade-off:} Unlike the paper, standard noise schedules achieve better PPL. Those noise schedules are probably easier to be learned faster but lack on convergence.
+    					
+    				\end{itemize}
+    				
+    				\vspace{0.1cm}
+    				\emph{The method effectively stabilizes training (low variance) immediately, but PPL gains from this stability likely require a longer training horizon, especially with our tiny run.}
+    			\end{block}
+    		\end{column}
+    	\end{columns}
     \end{frame}
 
 	% Slide 15
@@ -507,7 +532,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \begin{table}[t]
                     \centering
                     \caption{\scriptsize Effect of noise schedule on PPL and
-                    variance of NELBO for different $L'$ on LM1B. (?training steps?)}
+                    variance of NELBO for different $L'$ on LM1B. (5000 + 3000 training steps)}
                     \label{tab:noise_schedule_ablation}
 
                     \setlength{\tabcolsep}{3pt}
@@ -537,7 +562,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{column}
 
             \begin{column}{0.38\textwidth}
-                \vspace{0.1cm}
+                \vspace{0.01cm}
                 \begin{block}{Original vs Reproduction}
                     \vspace{0.1cm}
                     \textbf{Key takeaways:}
@@ -821,9 +846,9 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 MDLM                                                & 1370               \\
                 \midrule                                             % UPDATED LINE BELOW
                 \textbf{Block diffusion}                            & \textbf{Base}     & \textbf{IDDPM} & \textbf{EDM} & \makecell{\textbf{Sigmoid} \\ \textbf{(k = 0)}} & \textbf{FM} & \textbf{Simple} \\
-                BD3-LMs $L'=16$                                     & 1345              & 252            & 49.88        & 36.06                                           & 76213       & 53070           \\
-                \hspace{4.1em} $L'=8$                               & 1210              & 249            & 49.14        & 35.79                                           & 109169      & 36010741760     \\
-                \hspace{4.1em} $L'=4$                               & 1176              & 246            & 49.01        & \textbf{35.08}                                  & 67332       & 2396260         \\
+                BD3-LMs $L'=16$                                     & 1345              & 8048.88            & 1593.4        & 1150.15                                          & 76213       & 53070           \\
+                \hspace{4.1em} $L'=8$                               & 1210              & 7954.17            & 1569.75        & \textbf{1078.57}                                           & 109169      & 36010741760     \\
+                \hspace{4.1em} $L'=4$                               & 1176              & 7857.33            & 1565.6        & 1093.7                                  & 67332       & 2396260         \\
                 \bottomrule
             \end{tabular}
         \end{table}

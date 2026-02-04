@@ -5,5 +5,5 @@
 \beamer@subsubsectionintoc {2}{2}{1}{Alternative Noise Schedules}{17}{0}{2}
 \beamer@subsubsectionintoc {2}{2}{2}{Loss Reweighting in the NELBO Objective}{23}{0}{2}
 \beamer@sectionintoc {3}{Conclusion \& Future Work}{27}{0}{3}
-\beamer@sectionintoc {4}{Team Organization}{28}{0}{4}
-\beamer@sectionintoc {5}{Retrospection}{29}{0}{5}
+\beamer@sectionintoc {4}{Team Organization}{30}{0}{4}
+\beamer@sectionintoc {5}{Retrospection}{33}{0}{5}
