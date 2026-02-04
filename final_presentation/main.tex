@@ -276,14 +276,9 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     % \vspace{0.1cm}
                     \textbf{Key takeaways:}
                     \begin{itemize}
-                        \item \textbf{$L'=128\ and\ L'=4$:} Original clipping \emph{reduces Var.\ NELBO} and PPL. Reproduction shows no significant changes.
-
-                        \item \textbf{$L'=16$:} Original clipped $\mathcal{U}[0.3,0.8]$ \emph{slightly improves PPL} and \emph{clearly lowers variance} vs $\mathcal{U}[0,1]$; Reproduction preserves the \emph{direction} with smaller gaps.
+                        \begin{itemize} \item \textbf{L′∈{4,128}:} Original clipping improves PPL & Variance; Reproduction shows no significant change. \item \textbf{L′=16:} Reproduction mirrors the original's improvements (lower PPL/Variance), but with smaller margins. \end{itemize}
 
                     \end{itemize}
-
-                    \vspace{0.1cm}
-                    \emph{Conclusion: the clipped-schedule advantage is strong in the original, but the gaps lower significantly in our reproduction (making the values identical in some cases), likely due to our small model/short run.}
                 \end{block}
             \end{column}
         \end{columns}
