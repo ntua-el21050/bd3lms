@@ -438,7 +438,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \begin{table}[t]
             \centering
             \caption{\scriptsize Generation length statistics from sampling 10
-            documents from models trained on OWT (800 Pretraining Steps + 500 Fine-tuning Steps).}
+            documents from models trained on OWT (800 Pretraining Steps + 500 Fine-tuning Steps). BD3-LM reproduction with model length = 16K.}
             \label{tab:gen_length_stats}
 
             \setlength{\tabcolsep}{4pt} % tighter columns
@@ -460,11 +460,10 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \scriptsize
             \textbf{Key takeaways:}
             \begin{itemize}
-                \item \emph{Fixed vs variable-length preserved:} SEDD is capped at 1024 max, while BD3LM exceeds 1024; however original shows a much larger BD3LM max than reproduction.
+                \item \emph{Fixed vs variable-length preserved:} SEDD is capped at 1024 max, while BD3LM exceeds 1024.
 
                 \item \emph{Median ordering preserved:} Both original and reproduction keep the same ranking (AR $>$ SEDD $>$ BD3LM $>$ OWT train).
             \end{itemize}
-            \emph{Conclusion: reproduction preserves the ordering, but underestimates BD3LM’s max-length gain, likely missing long-tail samples at this scale.}
         \end{block}
     \end{frame}
     
