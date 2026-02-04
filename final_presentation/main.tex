@@ -247,17 +247,16 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \centering
                     \small
                     \setlength{\tabcolsep}{6pt}
-                    \parbox{1.5\linewidth}{Test Perplexities for single token
-                    generation on LM1B dataset\\
-                    (400 Pretraining Steps + 100 Fine-tuning Steps) }
+                    \parbox{1.0\linewidth}{Test Perplexities for single token
+                    generation on LM1B dataset (400 Pretraining Steps + 100 Fine-tuning Steps).}
 
                     \vspace{0.2cm}
                     \renewcommand{\arraystretch}{1.1}
 
                     \begin{tabular}{l l c c}
                         \toprule L'                   & Clipping                & PPL           & Var.\ NELBO    \\
-                        \midrule \multirow{2}{*}{128} & $\mathcal{U}[0, 0.5]$   & 1000          & 10.00          \\
-                                                      & $\mathcal{U}[0, 1]$     & 1000          & 10.00          \\
+                        \midrule \multirow{2}{*}{128} & $\mathcal{U}[0, 0.5]$   & 2106          & 1.27          \\
+                                                      & $\mathcal{U}[0, 1]$     & 2106          & 1.27          \\
                         \midrule \multirow{2}{*}{16}  & $\mathcal{U}[0.3, 0.8]$ & \textbf{1278} & \textbf{10.50} \\
                                                       & $\mathcal{U}[0, 1]$     & 1279          & 10.51          \\
                         \midrule \multirow{2}{*}{4}   & $\mathcal{U}[0.5, 1]$   & \textbf{1226} & \textbf{44.41} \\
@@ -267,22 +266,22 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \end{table}
             \end{column}
 
-            % ----- RIGHT: commentary placeholder (same as before) -----
+
             \begin{column}{0.42\textwidth}
-                \vspace{1cm}
-                \begin{block}{Commentary (placeholder)}
-                    \vspace{0.1cm}
-                    \textbf{Key takeaways:}
+                % \vspace{0.2cm}
+                \begin{block}{Original vs Reproduction}
+                    \scriptsize
+                    % \vspace{0.1cm}
+                    \textbf{Key takeaways (Orig. vs Repro.):}
                     \begin{itemize}
-                        \item \emph{???}
+                        \item \textbf{$L'=128\ and\ L'=4$:} Original clipping \emph{reduces Var.\ NELBO} and PPL. Reproduction shows no significant changes.
 
-                        \item \emph{???}
+                        \item \textbf{$L'=16$:} Original clipped $\mathcal{U}[0.3,0.8]$ \emph{slightly improves PPL} and \emph{clearly lowers variance} vs $\mathcal{U}[0,1]$; Repro. preserves the \emph{direction} with smaller gaps.
 
-                        \item \emph{???}
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{Conclusion...}
+                    \emph{Conclusion: the clipped-schedule advantage is strong in the original, but the gaps lower significantly in our reproduction (making the values identical in some cases), likely due to our small model/short run.}
                 \end{block}
             \end{column}
         \end{columns}
@@ -296,15 +295,14 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             % ----- LEFT: caption + table -----
             \begin{column}{0.58\textwidth}
                 \centering
-                \parbox{0.95\linewidth}{\centering
-                Test perplexities (PPL; $\downarrow$) of models on LM1B. (400 Pretraining
-                Steps + 100 Fine-tuning Steps)}
+                \parbox{0.8\linewidth}{Test perplexities (PPL; $\downarrow$) of models on LM1B (400 Pretraining
+                Steps + 100 Fine-tuning Steps).}
 
-                \vspace{0.2cm}
+                % \vspace{0.2cm}
 
                 \begin{table}
                     \centering
-                    \setlength{\tabcolsep}{22pt} % slightly tighter to leave room for the comment box
+                    \setlength{\tabcolsep}{22pt}
                     \renewcommand{\arraystretch}{1.15}
                     \begin{tabular}{@{}l r@{}}
                         \toprule                                                       & \textbf{PPL ($\downarrow$)} \\
@@ -322,22 +320,19 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \end{table}
             \end{column}
 
-            % ----- RIGHT: commentary placeholder -----
             \begin{column}{0.42\textwidth}
-                \vspace{0.9cm}
-                \begin{block}{Commentary (placeholder)}
-                    \vspace{0.1cm}
+                % \vspace{0.9cm}
+                \begin{block}{Original vs Reproduction}
+                    \scriptsize
                     \textbf{Key takeaways:}
                     \begin{itemize}
-                        \item \emph{???}
+                        \item \emph{AR performance gap:} Original Transformer beats diffusion/BD3LM (lowest PPL), while in reproduction Transformer is worst (highest PPL).
 
-                        \item \emph{???}
-
-                        \item \emph{???}
+                        \item \emph{BD3LM trends partly preserved:} Both show smaller $L'$ helps (best at $L'=4$), but original has \emph{all} BD3LM variants beating diffusion, while reproduction has $L'=8$ worse than both diffusion baselines.
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{Conclusion...}
+                    \emph{Conclusion: the $L'$ ranking within BD3LM is partly consistent, but cross-family comparisons (AR vs others, and diffusion vs BD3LM with $L'=8$) are not, likely from scaling/undertraining effects.}
                 \end{block}
             \end{column}
         \end{columns}
@@ -348,13 +343,11 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \footnotesize
 
         \begin{columns}[T,onlytextwidth]
-            % ----- LEFT: caption + table -----
             \begin{column}{0.58\textwidth}
                 \centering
-                \parbox{0.95\linewidth}{\centering
+                \parbox{0.8\linewidth}{
                 Test perplexities (PPL; $\downarrow$) of models on OWT. (800 Pretraining
                 Steps + 800 Fine-tuning Steps)}
-
                 \vspace{0.2cm}
 
                 \begin{table}
@@ -377,22 +370,19 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \end{table}
             \end{column}
 
-            % ----- RIGHT: commentary placeholder -----
             \begin{column}{0.42\textwidth}
-                \vspace{0.9cm}
-                \begin{block}{Commentary (placeholder)}
-                    \vspace{0.1cm}
+                % \vspace{0.9cm}
+                \begin{block}{Original vs Reproduction}
+                    \scriptsize
                     \textbf{Key takeaways:}
                     \begin{itemize}
-                        \item \emph{???}
+                        \item \emph{AR vs diffusion preserved:} In both original and reproduction, AR outperforms diffusion baselines (lower PPL).
 
-                        \item \emph{???}
-
-                        \item \emph{???}
+                        \item \emph{BD3LM vs AR flips:} Original ranks AR best overall (BD3LM worse than AR), while reprduction ranks BD3LM best (all BD3LM $<$ AR).
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{Conclusion...}
+                    \emph{Conclusion: diffusion-vs-AR relationships match the paper, but the global winner changes (AR in original vs BD3LM in reproduction), possibly exaggerated at this small scale.}
                 \end{block}
             \end{column}
         \end{columns}
@@ -406,7 +396,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \parbox{0.95\linewidth}{\centering}
         {Zero-shot validation perplexities ($\downarrow$) of models trained on OWT.(?training steps?)}
 
-        \vspace{0.25cm}
+        % \vspace{0.25cm}
 
         \begin{table}
             \centering
@@ -422,20 +412,19 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{tabular}%
         \end{table}
 
-        \vspace{0.25cm}
+        % \vspace{0.25cm}
 
-        \begin{block}{Commentary (placeholder)}
+        \begin{block}{Original vs Reproduction}
+            \scriptsize
             \textbf{Key takeaways:}
             \begin{itemize}
-                \item \emph{??? (e.g., BD3-LM improves on \ldots compared to diffusion
-                    baselines)}
+                \item \emph{Wikitext:} Original and reproduction both rank \textbf{AR best}, but original has \textbf{BD3LM} beating diffusion, while reproduction has \textbf{BD3LM worse} than both diffusion baselines.
 
-                \item \emph{??? (e.g., note where AR is still best / gap remains)}
+                \item \emph{LM1B:} Original ranks \textbf{AR best} (BD3LM second), but reproduction ranks \textbf{BD3LM best}.
 
-                \item \emph{??? (e.g., mention that diffusion values are upper bounds
-                    if relevant)}
+                \item \emph{Lambada:} Original ranks \textbf{diffusion best} (followed by BD3LM), while reproduction ranks \textbf{BD3LM best}.
             \end{itemize}
-            \emph{Conclusion...}
+            \emph{Conclusion: Generally, the winner per dataset shifts between original and reproduction, consistent with small-model transfer being noisy.}
         \end{block}
     \end{frame}
 
@@ -447,7 +436,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \begin{table}[t]
             \centering
             \caption{\scriptsize Generation length statistics from sampling 10
-            documents from models trained on OWT.(?training steps?)}
+            documents from models trained on OWT (800 Pretraining Steps + 500 Fine-tuning Steps).}
             \label{tab:gen_length_stats}
 
             \setlength{\tabcolsep}{4pt} % tighter columns
@@ -464,21 +453,16 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{tabular}
         \end{table}
 
-        \vspace{0.15cm} % slightly smaller gap than before
 
-        \begin{block}{Commentary (placeholder)}
-            \scriptsize % shrink the commentary text too
+        \begin{block}{Original vs Reproduction}
+            \scriptsize
             \textbf{Key takeaways:}
             \begin{itemize}
-                \item \emph{??? (e.g., diffusion models are constrained in max length,
-                    BD alleviates this)}
+                \item \emph{Fixed vs variable-length preserved:} In both, SEDD is capped at 1024 max, while BD3LM exceeds 1024; however original shows a much larger BD3LM max than reproduction.
 
-                \item \emph{??? (e.g., compare median vs max lengths across AR/SEDD/BD3)}
-
-                \item \emph{??? (e.g., mention practical implication for long-form
-                    generation)}
+                \item \emph{Median ordering preserved:} Both original and reproduciton keep the same ranking (AR median $>$ SEDD $>$ BD3LM $>$ OWT train).
             \end{itemize}
-            \emph{Conclusion...}
+            \emph{Conclusion: reproduction preserves the ordering, but underestimates BD3LM’s max-length gain, likely missing long-tail samples at this scale.}
         \end{block}
     \end{frame}
 
@@ -516,7 +500,6 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \scriptsize % smaller than footnotesize to help height fit
 
         \begin{columns}[T,onlytextwidth]
-            % ----- LEFT: existing table -----
             \begin{column}{0.6\textwidth}
                 \centering
                 \begin{table}[t]
@@ -531,27 +514,26 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \resizebox{!}{0.36\textheight}{%
                     \begin{tabular}{lcc}
                         \toprule Noise schedule                        & PPL            & Var.\ NELBO   \\
-                        \midrule \multicolumn{3}{l}{\textbf{$L' = 4$}}  \\
+                        \midrule \multicolumn{3}{l}{\textbf{$L' = 4$}}                                  \\
                         Clipped                                        &                &               \\
-                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 1199.43 & \textbf{15.2313} \\
-                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 1101.03          & 27.6118         \\
-                        Linear $\mathcal{U}[0,1]$                      & 751.15          & 260.1035         \\
-                        Logarithmic                                    & 750.05          & 125.6219         \\
-                        Square root                                    & \textbf{718.90} & 83.832         \\
-                        \midrule \multicolumn{3}{l}{\textbf{$L' = 16$}} \\
+                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 1199 & \textbf{15.23}          \\
+                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 1101 & 27.61                   \\
+                        Linear $\mathcal{U}[0,1]$                      & 751 & 260.10                   \\
+                        Logarithmic                                    & 750 & 125.62                   \\
+                        Square root                                    & \textbf{719} & 83.83           \\
+                        \midrule \multicolumn{3}{l}{\textbf{$L' = 16$}}                                 \\
                         Clipped                                        &                &               \\
-                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 1056.46   & \textbf{4.3476}         \\
-                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 797.62 & 6.4124 \\
-                        Linear $\mathcal{U}[0,1]$                      & 661.99          & 44.7271          \\
-                        Square                                         & \textbf{627.02}          & 27.5325         \\
-                        Cosine                                         & 633.59          & 20.8008         \\
+                        \hspace{1em}$\mathcal{U}[0.45, 0.95]$          & 1056 & \textbf{4.35}           \\
+                        \hspace{1em}$\mathcal{U}[0.3, 0.8]$            & 798 & 6.41                     \\
+                        Linear $\mathcal{U}[0,1]$                      & 662          & 44.73           \\
+                        Square                                         & \textbf{627}          & 27.53  \\
+                        Cosine                                         & 634          & 20.80           \\
                         \bottomrule
                     \end{tabular}%
                     }
                 \end{table}
             \end{column}
 
-            % ----- RIGHT: commentary placeholder (matching earlier slides) -----
             \begin{column}{0.38\textwidth}
                 \vspace{0.1cm}
                 \begin{block}{Table 8 Reproduction}
@@ -565,7 +547,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{The method effectively stabilizes training (low variance) immediately, but PPL gains from this stability likely require a longer training horizon}
+                    \emph{The method effectively stabilizes training (low variance) immediately, but PPL gains from this stability likely require a longer training horizon, especially with our tiny run.}
                 \end{block}
             \end{column}
         \end{columns}
@@ -677,7 +659,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
         \]
     \end{frame}
 
-	% Slide 20
+		% Slide 20
     \begin{frame}{New Schedules' Results}
         \tiny
         \centering
@@ -709,10 +691,10 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \cmidrule(lr){2-4}\cmidrule(lr){5-7} & Noise Schedule                                    & PPL                                           & Var.\ NELBO    & Noise Schedule                  & PPL  & Var.\ NELBO \\
                 \midrule
 
-\multirow{4}{*}{128}                                 & Loglinear                                         & 1000                                          & 10.00          & Gaussian ($\mu=$0.5)            & 1000 & 10.00                          \\
-                                                     & Loglinear $\mathcal{U}[0,\,0.5]$                  & 1000                                          & 10.00          & Gaussian ($\mu=$0.6)            & 1000 & 10.00                          \\
-                                                     & Cosine                                            & 1000                                          & 10.00          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 1000 & 10.00                          \\
-                                                     & Cosine $\mathcal{U}[0,\,0.5]$                     & 1000                                          & 10.00          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & 1000 & 10.00                          \\
+\multirow{4}{*}{128}                                 & Loglinear                                         & 2106                                          & 1.27          & Gaussian ($\mu=$0.5)            & 2115 & 1.29                          \\
+                                                     & Loglinear $\mathcal{U}[0,\,0.5]$                  & 2106                                          & 1.27          & Gaussian ($\mu=$0.6)            & 2212 & 1.34                          \\
+                                                     & Cosine                                            & 2154                                          & 1.31          & B.G. ($\mu_{1}=0.3, w_{1}=0.6$) & 2184 & 1.31                          \\
+                                                     & Cosine $\mathcal{U}[0,\,0.5]$                     & 2150                                          & 1.30          & B.G. ($\mu_{1}=0.1, w_{1}=0.6$) & \textbf{2089} & \textbf{1.19}                          \\
                 \midrule
 
 \multirow{4}{*}{16}                                  & Loglinear                                         & 1279                                          & 10.50          & Gaussian ($\mu=$0.5)            & \textbf{1234} & \textbf{10.28}        \\
