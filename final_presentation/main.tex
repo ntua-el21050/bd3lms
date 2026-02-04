@@ -256,13 +256,13 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \renewcommand{\arraystretch}{1.1}
 
                     \begin{tabular}{l l c c}
-                        \toprule L'                   & Clipping                & PPL           & Var.\ NELBO    \\
-                        \midrule \multirow{2}{*}{128} & $\mathcal{U}[0, 0.5]$   & 2106          & 1.27          \\
-                                                      & $\mathcal{U}[0, 1]$     & 2106          & 1.27          \\
-                        \midrule \multirow{2}{*}{16}  & $\mathcal{U}[0.3, 0.8]$ & \textbf{1278} & \textbf{10.50} \\
-                                                      & $\mathcal{U}[0, 1]$     & 1279          & 10.51          \\
-                        \midrule \multirow{2}{*}{4}   & $\mathcal{U}[0.5, 1]$   & \textbf{1226} & \textbf{44.41} \\
-                                                      & $\mathcal{U}[0, 1]$     & \textbf{1226} & \textbf{44.41} \\
+                        \toprule L'                   & Clipping                & PPL           & Var.\ NELBO                     \\
+                        \midrule \multirow{2}{*}{128} & $\mathcal{U}[0, 0.5]$   & \textbf{2106}          & \textbf{1.27}          \\
+                                                      & $\mathcal{U}[0, 1]$     & \textbf{2106}          & \textbf{1.27}          \\
+                        \midrule \multirow{2}{*}{16}  & $\mathcal{U}[0.3, 0.8]$ & \textbf{1278} & \textbf{10.50}                  \\
+                                                      & $\mathcal{U}[0, 1]$     & 1279          & 10.51                           \\
+                        \midrule \multirow{2}{*}{4}   & $\mathcal{U}[0.5, 1]$   & \textbf{1226} & \textbf{44.41}                  \\
+                                                      & $\mathcal{U}[0, 1]$     & \textbf{1226} & \textbf{44.41}                  \\
                         \bottomrule
                     \end{tabular}
                 \end{table}
@@ -274,11 +274,11 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                 \begin{block}{Original vs Reproduction}
                     \scriptsize
                     % \vspace{0.1cm}
-                    \textbf{Key takeaways (Orig. vs Repro.):}
+                    \textbf{Key takeaways:}
                     \begin{itemize}
                         \item \textbf{$L'=128\ and\ L'=4$:} Original clipping \emph{reduces Var.\ NELBO} and PPL. Reproduction shows no significant changes.
 
-                        \item \textbf{$L'=16$:} Original clipped $\mathcal{U}[0.3,0.8]$ \emph{slightly improves PPL} and \emph{clearly lowers variance} vs $\mathcal{U}[0,1]$; Repro. preserves the \emph{direction} with smaller gaps.
+                        \item \textbf{$L'=16$:} Original clipped $\mathcal{U}[0.3,0.8]$ \emph{slightly improves PPL} and \emph{clearly lowers variance} vs $\mathcal{U}[0,1]$; Reproduction preserves the \emph{direction} with smaller gaps.
 
                     \end{itemize}
 
@@ -380,7 +380,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
                     \begin{itemize}
                         \item \emph{AR vs diffusion preserved:} In both original and reproduction, AR outperforms diffusion baselines (lower PPL).
 
-                        \item \emph{BD3LM vs AR flips:} Original ranks AR best overall (BD3LM worse than AR), while reprduction ranks BD3LM best (all BD3LM $<$ AR).
+                        \item \emph{BD3LM vs AR flips:} Original ranks AR best overall (BD3LM worse than AR), while reproduction ranks BD3LM best (all BD3LM $<$ AR).
                     \end{itemize}
 
                     \vspace{0.1cm}
@@ -460,9 +460,9 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \scriptsize
             \textbf{Key takeaways:}
             \begin{itemize}
-                \item \emph{Fixed vs variable-length preserved:} In both, SEDD is capped at 1024 max, while BD3LM exceeds 1024; however original shows a much larger BD3LM max than reproduction.
+                \item \emph{Fixed vs variable-length preserved:} SEDD is capped at 1024 max, while BD3LM exceeds 1024; however original shows a much larger BD3LM max than reproduction.
 
-                \item \emph{Median ordering preserved:} Both original and reproduciton keep the same ranking (AR median $>$ SEDD $>$ BD3LM $>$ OWT train).
+                \item \emph{Median ordering preserved:} Both original and reproduction keep the same ranking (AR $>$ SEDD $>$ BD3LM $>$ OWT train).
             \end{itemize}
             \emph{Conclusion: reproduction preserves the ordering, but underestimates BD3LM’s max-length gain, likely missing long-tail samples at this scale.}
         \end{block}
@@ -538,7 +538,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 
             \begin{column}{0.38\textwidth}
                 \vspace{0.1cm}
-                \begin{block}{Table 8 Reproduction}
+                \begin{block}{Original vs Reproduction}
                     \vspace{0.1cm}
                     \textbf{Key takeaways:}
                     \begin{itemize}
@@ -678,7 +678,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \item Perplexities (PPL) and Var.\ NELBO for implemented vs new schedules
             on LM1B (400 Pretraining Steps + 100 Fine-tuning Steps).
             \item B.G. stands for Bimodal Gaussian.
-            \item We use constant values: $\sigma^2=x$ (Gaussian) and $\sigma_1^2=x, \sigma_2^2=x$ (B.G.) for all experiments. Training under varying $\mu$ and $\mu_1, w_1$\ respectively.  
+            \item We use constant values: $\sigma^2=0.1$ (Gaussian) and $\sigma_1^2=0.02, \sigma_2^2=0.08$ (B.G.) for all experiments. Training under varying $\mu$ and $\mu_1, w_1$\ respectively.  
         \end{itemize}
         }
 
@@ -835,6 +835,74 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
 	% Slide 25
     \section{Team Organization}
 
+        \begin{frame}
+        \frametitle{Team Organization and Structure}
+        \centering
+        \resizebox{\textwidth}{!}{
+        \begin{forest}
+            for tree={ draw, rounded corners, node options={align=center}, fill=blue!5, % Χρώμα φόντου
+            edge={-stealth, thick}, font=\small\sffamily, l sep=0.8cm, s sep=0.2cm, },
+            where level=0{fill=blue!20, font=\bfseries}{}, where level=1{fill=blue!10, font=\bfseries}{},
+            [Team [Subteam 1 \\
+            Members \\
+            2 3 4 [Table 1] [Table 2] [Table 3] [Figure 1] [Presentation\\
+            (2nd half), font=\itshape] ] [Subteam 2 \\
+            Members \\
+            1 5 6 [Table 4] [Table 5] [Table 6] [Table 7] [Table 8] [Presentation\\
+            (1st half), font=\itshape] ] ]
+        \end{forest}
+        }
+
+        %
+
+        \vspace{1cm}
+        \textbf{Coordination:}
+        \begin{itemize}
+            \item Weekly team meetings
+
+            \item Subteams internal coordination
+
+            \item GitHub repo
+
+            \item Discord server
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Member Roles}
+        \ra{1.3}
+        \begin{table}
+            \centering
+            \begin{tabular}{clc}
+                \toprule \textbf{Phase} & \textbf{Description}      & \textbf{Members} \\
+                \midrule 1              & Paper \& codebase study   & Everyone           \\
+                2                       & Environment \& data setup & Georgios M., Petros            \\
+                3                       & Initial reproduction      & Georgios M., Petros, Ilias           \\
+                4                       & Final reproduction        & Georgios Nt., Konstantinos, Nikolaos            \\
+                5                       & Extension experiments     & Everyone          \\
+                6                       & Analysis \& Writing       & Everyone           \\
+                \bottomrule
+            \end{tabular}
+        \end{table}
+    \end{frame}
+
 	% Slide 26
     \section{Retrospection}
+    
+    % Slide 27
+    \begin{frame}{Retrospection}
+        \begin{itemize}
+            \item \textbf{What challenged us:}
+            \begin{itemize}
+                \item Limited resources, which constrained training length and the number of ablations we could run.
+                \item The LM1B training pipeline depended on a Hugging Face repository that was temporarily unavailable, causing delays and forcing workarounds.
+            \end{itemize}
+
+            \vspace{0.2cm}
+            \item \textbf{What we could have done better:}
+            \begin{itemize}
+                \item Align the two subteams on a shared training protocol (same number of training steps and checkpoints) to make results more directly comparable.
+            \end{itemize}
+        \end{itemize}
+    \end{frame}
 \end{document}
