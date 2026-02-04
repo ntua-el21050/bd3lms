@@ -89,11 +89,11 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \column{0.5\textwidth}
             \textbf{Autoregressive (AR):}
             \begin{itemize}
-                \item Token-by-token generation %Σειριακή εξάρτηση των δεδομένων%
+                \item Token-by-token generation
 
-                \item High quality %Κάπου εδώ να αναφερθεί τι είναι το perplexity%
+                \item High quality
 
-                \item KV caching %Αποφυγή επανυπολογισμού των key και value vectos στο attention, πρέπει να το αναφέρουμε σίγουρα προφορικά ίσως και γραπτά%
+                \item KV caching
 
                 \item Variable length
             \end{itemize}
@@ -101,7 +101,7 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \column{0.5\textwidth}
             \textbf{Diffusion:}
             \begin{itemize}
-                \item Parallel generation % Η πιθανότητα κάθε θέσης ανεξάρτητη από τις άλλες - σε αντίθεση με τη σειριακή εξάρτηση πριν - ταυτόχρονο generation
+                \item Parallel generation
 
                 \item Better controllability
 
@@ -875,7 +875,7 @@ tuning Steps).
     % Slide 26
     \begin{frame}{Future Work}
         \begin{block}{Frequency-Informed Masking}
-            Prioritize masking rare, information-rich tokens (which carry more semantics) rather than common function words, changing \emph{which} tokens are masked---not only \emph{how many}.
+            Prioritize masking rare, information-rich tokens (which carry more semantics) rather than common function words, changing \emph{which} tokens are masked, not only \emph{how many}.
         \end{block}
         
         \begin{block}{Adaptive block size}
@@ -901,11 +901,9 @@ tuning Steps).
             where level=0{fill=blue!20, font=\bfseries}{}, where level=1{fill=blue!10, font=\bfseries}{},
             [Team [Subteam 1 \\
             Members \\
-            2 3 4 [Table 1] [Table 2] [Table 3] [Figure 1] [Presentation\\
-            (2nd half), font=\itshape] ] [Subteam 2 \\
+            2 3 4 [Table 1] [Table 2] [Table 3] [Figure 1] [Extension 1, font=\itshape] ] [Subteam 2 \\
             Members \\
-            1 5 6 [Table 4] [Table 5] [Table 6] [Table 7] [Table 8] [Presentation\\
-            (1st half), font=\itshape] ] ]
+            1 5 6 [Table 4] [Table 5] [Table 6] [Table 7] [Table 8] [Extension 2, font=\itshape] ] ]
         \end{forest}
         }
 
@@ -929,12 +927,13 @@ tuning Steps).
         \ra{1.3}
         \begin{table}
             \centering
-            \begin{tabular}{clc}
+            \setlength{\tabcolsep}{3.5pt}
+            \begin{tabular}{@{}clc@{}}
                 \toprule \textbf{Phase} & \textbf{Description}      & \textbf{Members} \\
                 \midrule 1              & Paper \& codebase study   & Everyone           \\
                 2                       & Environment \& data setup & Georgios M., Petros            \\
                 3                       & Initial reproduction      & Georgios M., Petros, Ilias           \\
-                4                       & Final reproduction        & Georgios Nt., Konstantinos, Nikolaos            \\
+                4                       & Final reproduction        & Georgios Nt., Konstantinos, Nikolaos \\
                 5                       & Extension experiments     & Everyone          \\
                 6                       & Analysis \& Writing       & Everyone           \\
                 \bottomrule
