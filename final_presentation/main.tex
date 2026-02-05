@@ -550,19 +550,18 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
             \end{column}
 
             \begin{column}{0.38\textwidth}
-                \vspace{0.01cm}
+                \vspace{1cm}
                 \begin{block}{Original vs Reproduction}
                     \vspace{0.1cm}
                     \textbf{Key takeaways:}
                     \begin{itemize}
-                        \item \emph{Variance Hypothesis Confirmed:} Clipped schedules reduced NELBO variance by ~17x (from 260.1 to 15.2), validating the method's stability.
+                        \item \emph{Confirmed Variance Hypothesis:} Clipped schedules NELBO variance ↓
 
-                        \item \emph{Perplexity trade-off:} Unlike the paper, standard noise schedules achieve better PPL. Those noise schedules are probably easier to be learned faster but lack on convergence.
-
+                        \item \emph{Perplexity trade-off:} Unlike the paper, standard noise schedules achieve better PPL.
                     \end{itemize}
 
                     \vspace{0.1cm}
-                    \emph{The method effectively stabilizes training (low variance) immediately, but PPL gains from this stability likely require a longer training horizon, especially with our tiny run.}
+                    \emph{Low variance is achieved in less training steps than PPL gains for small scale models.}
                 \end{block}
             \end{column}
         \end{columns}
