@@ -467,8 +467,8 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
     			\scriptsize
     			
     			Generative Perplexity (Gen.PPL;↓) and number of Function
-    			Evaluations (NFEs;↓) of 300 samples. All models are trained on WikiText2.
-    			(200 + 100 training steps)
+    			Evaluations (NFEs;↓) of 300 samples. All models are trained on OWT.
+    			(400 + 100 training steps)
     			
     			\vspace{0.2cm}
     			
@@ -479,12 +479,12 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
     				\toprule
     				Model & PPL & NFEs \\
     				\midrule
-    				AR & 5 & 5 \\
-    				SEDD & 5 & 5 \\
-    				MDLM & 5 & 5 \\
-    				BD3-LM $L'=16$ & 5 & 5 \\
-    				BD3-LM $L'=8$ & 5 & 5 \\
-    				BD3-LM $L'=4$ & 5 & 5 \\
+    				AR & 79165 & 1024 \\
+    				SEDD & 29987 & 1023 \\
+    				MDLM & 25632 & 1023 \\
+    				BD3-LM $L'=16$ & \textbf{7576} & 1023 \\
+    				BD3-LM $L'=8$ & 8176 & 1023 \\
+    				BD3-LM $L'=4$ & 9785 & 1023 \\
     				\bottomrule
     			\end{tabular}
     		\end{column}
@@ -496,14 +496,14 @@ Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos}
     				\vspace{0.1cm}
     				\textbf{Key takeaways:}
     				\begin{itemize}
-    					\item \emph{Variance Hypothesis Confirmed:} Clipped schedules reduced NELBO variance by ~17x (from 260.1 to 15.2), validating the method's stability.
+    					\item \emph{Sampling Quality:} Confirmed Bd3-lms $>$ Diff for same NFEs
     					
-    					\item \emph{Perplexity trade-off:} Unlike the paper, standard noise schedules achieve better PPL. Those noise schedules are probably easier to be learned faster but lack on convergence.
+    					\item \emph{AR performance gap:} AR > all in original vs all > AR in reproduction.
     					
     				\end{itemize}
     				
     				\vspace{0.1cm}
-    				\emph{The method effectively stabilizes training (low variance) immediately, but PPL gains from this stability likely require a longer training horizon, especially with our tiny run.}
+    				\emph{NFEs $\geq L$. Sampling quality improves for Bd3-lms (Gen.PPL;↓). AR models converge slowly.}
     			\end{block}
     		\end{column}
     	\end{columns}
