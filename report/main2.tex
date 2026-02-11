@@ -353,7 +353,29 @@ The ablation supports the presentation takeaway: clipped schedules reliably redu
 
 \section{Extension 1: Alternative Noise Schedules}
 \FloatBarrier
-\subsection{Gaussian and bimodal Gaussian schedules}
+\subsection{Already Implemented Noise Schedules}
+Table~\ref{tab:implemented_schedules} summarizes the noise schedules already provided in the codebase, expressed in terms of the masked probability $p(t)$ and the induced loss scaling $\text{loss\_scaling}(t)=-\frac{p'(t)}{p(t)}$.
+
+\begin{table}[H]
+  \centering
+  \caption{Already implemented noise schedules: masked probability $p(t)$ and induced loss scaling.}
+  \label{tab:implemented_schedules}
+  \setlength{\tabcolsep}{9pt}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabular}{@{}l l l@{}}
+    \toprule
+    \textbf{Schedule} & \textbf{$p(t)$} & \textbf{$\text{loss\_scaling}(t)$} \\
+    \midrule
+    LogLinear & $t$ & $-\dfrac{1}{t}$ \\
+    Square & $t^{2}$ & $-\dfrac{2}{t}$ \\
+    Square root & $t^{0.5}$ & $-\dfrac{1}{2t}$ \\
+    Logarithmic & $\dfrac{\log(1+t)}{\log 2}$ & $-\dfrac{1}{(1+t)\,\log(1+t)}$ \\
+    Cosine & $1-(1-\varepsilon)\cos\!\left(\dfrac{\pi t}{2}\right)$ & $-\dfrac{\left(\frac{\pi}{2}\right)(1-\varepsilon)\sin\!\left(\frac{\pi t}{2}\right)}{1-(1-\varepsilon)\cos\!\left(\frac{\pi t}{2}\right)}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Gaussian \& Bimodal Gaussian Noise Schedules}
 We propose schedules that directly sample the masked probability $p(t)\in(0,1)$.
 For a (truncated) Gaussian schedule, given mean $\mu$ and standard deviation $\sigma$, define $\alpha=\frac{0-\mu}{\sigma}$, $\beta=\frac{1-\mu}{\sigma}$, $\Phi$ the standard normal CDF, and $\varphi$ the pdf.
 Let $\Phi_{\alpha}=\Phi(\alpha)$, $\Phi_{\beta}=\Phi(\beta)$, and $Z=\Phi_{\beta}-\Phi_{\alpha}$.
@@ -368,7 +390,28 @@ The induced scaling is
 
 For a bimodal Gaussian schedule, we choose a mixture weight $w\in(0,1)$ and two Gaussians $(\mu_1,\sigma_1)$ and $(\mu_2,\sigma_2)$.
 With probability $w$ we use the first component; otherwise the second.
-The resulting $p(t)$ and scaling are piecewise (as summarized in the presentation).
+Writing $w_1=w$ and $w_2=1-w$, we define a split time coordinate
+\begin{equation}
+  t_1 = \frac{t}{w_1}\;\; (t<w_1), \qquad t_2 = \frac{t-w_1}{w_2}\;\; (t\ge w_1),
+\end{equation}
+and sample
+\begin{equation}
+  p(t) =
+  \begin{cases}
+    \mu_{1}+\sigma_{1}z_{1}(t_{1}), & t<w_{1}, \\
+    \mu_{2}+\sigma_{2}z_{2}(t_{2}), & t\ge w_{1},
+  \end{cases}
+\end{equation}
+where each $z_i(\cdot)$ is defined as in the Gaussian case but with its own truncation constants $\alpha_i=\frac{0-\mu_i}{\sigma_i}$, $\beta_i=\frac{1-\mu_i}{\sigma_i}$ and $Z_i=\Phi_{\beta_i}-\Phi_{\alpha_i}$.
+The induced scaling is also piecewise:
+\begin{equation}
+  \text{loss\_scaling}(t)
+  = -\frac{1}{p(t)}
+  \begin{cases}
+    \frac{1}{w_1}\frac{\sigma_1 Z_1}{\varphi(z_1(t_1))}, & t<w_{1}, \\
+    \frac{1}{w_2}\frac{\sigma_2 Z_2}{\varphi(z_2(t_2))}, & t\ge w_{1}.
+  \end{cases}
+\end{equation}
 
 \subsection{Results}
 Table~\ref{tab:new_schedules} compares the new schedules to existing ones under the same protocol.
