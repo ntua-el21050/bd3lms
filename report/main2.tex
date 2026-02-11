@@ -50,8 +50,8 @@
 \large Reproduction Results and Two Practical Extensions}
 
 \author{
-  Ntountounakis Georgios, Markoulidakis Georgios, Vitalis Petros,\\
-  Makras Ilias, Kritharidis Konstantinos, Kordas Nikolaos\\
+  \textbf{Kordas Nikolaos, Kritharidis Konstantinos, Makras Ilias},\\
+  \textbf{Markoulidakis Georgios, Ntountounakis Georgios, Vitalis Petros}\\
   National Technical University of Athens
 }
 
@@ -82,23 +82,6 @@ Block diffusion (BD3-LMs) is a hybrid: it is autoregressive over blocks and diff
 This design targets a controllable trade-off between quality and parallelism via the block size $L'$.
 At the extremes, $L'=1$ reduces to token-level AR, while $L'=L$ (the full sequence length) becomes a fully parallel diffusion model.
 
-\section{Background: Masked Discrete Diffusion and Noise Schedules}
-We focus on masked discrete diffusion, where noising corresponds to masking tokens with probability $p(t)$ as a function of a continuous time index $t\sim\mathcal{U}[0,1]$.
-Define the keep (no-mask) probability
-\begin{equation}
-  a(t) = 1 - p(t).
-\end{equation}
-A key quantity that appears in the (masked) diffusion objective is the schedule-induced scaling
-\begin{equation}
-  \text{loss\_scaling}(t) 
-  = \frac{a'(t)}{1-a(t)}
-  = -\frac{p'(t)}{p(t)},
-\end{equation}
-which acts as a weighting of per-token log-likelihood terms across noise levels.
-
-We consider standard schedules (loglinear, square, square root, logarithmic, cosine) and also investigate clipped schedules, where $t$ is sampled from a restricted interval $\mathcal{U}[\tau_{\min},\tau_{\max}]$.
-The presentation results suggest that clipping can reduce gradient variance (as measured by variance of the NELBO estimator), though perplexity improvements are not guaranteed under limited training.
-
 \section{Block Diffusion Models (BD3-LMs)}
 BD3-LMs factorize a sequence into contiguous blocks of length $L'$.
 Generation proceeds autoregressively at the block level: each block is generated conditioned on the previous blocks.
@@ -111,7 +94,25 @@ This hybridization yields:
   \item \textbf{A single knob $L'$:} a direct quality--parallelism trade-off.
 \end{itemize}
 
+\section{Background: Masked Discrete Diffusion and Noise Schedules}
+We focus on masked discrete diffusion, where noising corresponds to masking tokens with probability $p(t)$ as a function of a continuous time index $t\sim\mathcal{U}[0,1]$. $t$ essentially corresponds to the noise level to be applied. In general, larger values of $t$ are associated with a higher proportion of masking, whereas smaller values of t correspond to a lower proportion of masking. However, the exact masking probability $p(t)$, is determined by the specific noise schedule used. Accordingly, the complementary keep (no-mask) probability is defined as:
+\begin{equation}
+  a(t) = 1 - p(t).
+\end{equation}
+Another quantity derived as a function of $t$ is the loss scaling:
+\begin{equation}
+  \text{loss\_scaling}(t) 
+  = \frac{a'(t)}{1-a(t)}
+  = -\frac{p'(t)}{p(t)},
+\end{equation}
+which acts as a weighting of per-token log-likelihood terms across noise levels during training.
+
+We consider standard schedules (loglinear, square, square root, logarithmic, cosine) and also investigate clipped schedules, where $t$ is sampled from a restricted interval $\mathcal{U}[\tau_{\min},\tau_{\max}]$.
+
 \section{Experimental Protocol and Metrics}
+    \text{\Large{This needs to be written better.}}\\
+    \text{\Large{Some things need to be added as well, e.g. tiny model, batch size, model length.}}\\
+
 We summarize the protocol used in our experiments (as reported in the final presentation):
 \begin{itemize}
   \item \textbf{Datasets:} LM1B and OpenWebText (OWT), plus transfer evaluation on Lambada and Wikitext.
@@ -123,7 +124,10 @@ We summarize the protocol used in our experiments (as reported in the final pres
 
 \section{Reproduction Results}
 \FloatBarrier
-\subsection{AR vs BD3-LM at $L'=1$}
+\subsection{AR vs BD3-LM with $L'=1$}
+The first experiment we reproduced, was the comparison between AR and BD3-LM models with block size equal to 1.
+As the authors of the original paper explain, the expected value of the variance NELBO of the AR and the BD3-LM with $L'=1$ are equal. What the authors found though, was that in practice the AR achieves better perplexity score than the BD3-LM. They explained that this was due to higher training variance in the BD3-LM's case. Using their default Log-linear noise schedule, meant that only half of the tokens would be masked. As a result the training cross-entropy would not be computed for half the tokens. They managed to overcome this, by setting the mask probability equal to 1, using a tuned schedule where $t\sim\mathcal{U}[1,1]$.
+
 Table~\ref{tab:ar_vs_bd3lm_l1} compares token-level AR and BD3-LM with $L'=1$ on LM1B.
 
 \begin{table}[!htbp]
@@ -143,9 +147,9 @@ Table~\ref{tab:ar_vs_bd3lm_l1} compares token-level AR and BD3-LM with $L'=1$ on
   \end{tabular}
 \end{table}
 
-We also include the training curves used in the presentation (Figure~\ref{fig:l1_curves}) to visually compare optimization behavior.
+We also include the training curves used in the presentation (Figure~\ref{fig:l1_curves}) to visually compare training nll behavior.
 
-\begin{figure}[!htbp]
+\begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
@@ -162,9 +166,11 @@ We also include the training curves used in the presentation (Figure~\ref{fig:l1
     \safeincludegraphics[width=\linewidth]{fig3.png}
     \caption{BD3-LM + tuned schedule}
   \end{subfigure}
-  \caption{Curves from the final presentation for single-token generation on LM1B.}
+  \caption{Training NLL curves for single-token generation on LM1B.}
   \label{fig:l1_curves}
 \end{figure}
+
+We indeed verify that the AR model scores better PPL than the BD3-LM model, but we fail to reproduce the same improvement when using the tuned schedule. The perplexity gap is not closed in this case, although it is slightly narrowed. With the help of the training nll curves, we observe that the BD3-LM models clearly suffer more from overfitting. Consequently, in our case the problem is not the higher variance, but the overfitting which is obviously caused by our limited resources. This of course becomes apparent if we compare our ppl scores with the ones of the original paper, where the AR scores 22.88 and the BD3-LM scores 25.56.
 
 \subsection{Effect of clipped noise schedules}
 Table~\ref{tab:clipping_effect} reports PPL and Var.\ NELBO for several $L'$ values under clipped and unclipped uniform time sampling on LM1B.
@@ -196,7 +202,7 @@ Under our reproduced settings, clipping is most clearly beneficial for $L'=16$ (
 \subsection{LM1B and OWT comparisons}
 Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baselines, and BD3-LM variants.
 
-\begin{table}[!htbp]
+\begin{table}[H]
   \centering
   \caption{Test perplexities on LM1B (400 pretraining steps + 100 fine-tuning steps).}
   \label{tab:lm1b_main}
@@ -221,7 +227,7 @@ Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baseline
   \end{tabular}
 \end{table}
 
-\begin{table}[!htbp]
+\begin{table}[H]
   \centering
   \caption{Test perplexities on OWT (3000 pretraining steps + 3000 fine-tuning steps).}
   \label{tab:owt_main}
