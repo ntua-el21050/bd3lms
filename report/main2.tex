@@ -21,6 +21,13 @@
 \usepackage{flafter}
 \usepackage[section]{placeins}
 
+% --- ADDED PACKAGE FOR FIXING TABLE SIZES ---
+\usepackage{tabularx}
+% Define a centered flexible column for tabularx
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+% --------------------------------------------
+
 % Float tuning: keep floats near where they are introduced.
 \setcounter{topnumber}{5}
 \setcounter{bottomnumber}{5}
@@ -110,16 +117,30 @@ which acts as a weighting of per-token log-likelihood terms across noise levels 
 We consider standard schedules (loglinear, square, square root, logarithmic, cosine) and also investigate clipped schedules, where $t$ is sampled from a restricted interval $\mathcal{U}[\tau_{\min},\tau_{\max}]$.
 
 \section{Experimental Protocol and Metrics}
-    \text{\Large{This needs to be written better.}}\\
-    \text{\Large{Some things need to be added as well, e.g. tiny model, batch size, model length.}}\\
+To evaluate the efficacy of Block Diffusion models (BD3-LMs) against Autoregressive (AR) and standard Diffusion baselines (SEDD, MDLM), we adopted a rigorous experimental protocol tailored to resource-constrained environments.
 
-We summarize the protocol used in our experiments (as reported in the final presentation):
+\subsection{Model Configuration and Datasets}
+Due to computational limitations, we utilized a \textbf{tiny} transformer configuration for all models to ensure a fair comparison under identical resource budgets.
 \begin{itemize}
-  \item \textbf{Datasets:} LM1B and OpenWebText (OWT), plus transfer evaluation on Lambada and Wikitext.
-  \item \textbf{Training regimen:} pretraining and fine-tuning phases reported in the table captions (e.g., 400 pretraining steps + 100 fine-tuning steps on LM1B for many comparisons).
-  \item \textbf{Likelihood metrics:} test perplexity (PPL; lower is better).
-  \item \textbf{Objective stability:} variance of the NELBO estimator (Var.\ NELBO; lower is better).
-  \item \textbf{Sampling quality:} generative perplexity (Gen.PPL; lower is better) and number of function evaluations (NFEs).
+    \item \textbf{Sequence Length:} A key feature of BD3-LMs is variable-length generation. We configured the BD3-LM with a maximum model length of \textbf{16K tokens} to test generation capabilities beyond the standard fixed-length caps (e.g., 1024 tokens) of baseline diffusion models.
+    \item \textbf{Datasets:} We primarily utilized \textbf{LM1B} (One Billion Word Benchmark) and \textbf{OpenWebText (OWT)} for training and perplexity evaluations. For zero-shot transfer evaluation, models trained on OWT were assessed on \textbf{Lambada} and \textbf{Wikitext}.
+\end{itemize}
+
+\subsection{Training Regimen}
+Our training protocol consists of distinct pretraining and fine-tuning phases. The specific step counts varied by experiment to balance convergence with compute availability:
+\begin{itemize}
+    \item \textbf{Noise Schedule Ablations (LM1B):} 400 pretraining steps followed by 100 fine-tuning steps.
+    \item \textbf{Large-Scale Comparisons (OWT):} Extended training of 3000 pretraining steps and 3000 fine-tuning steps.
+    \item \textbf{Transfer \& Sampling:} 800 pretraining steps followed by 500--800 fine-tuning steps.
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+We employed a comprehensive suite of metrics to evaluate likelihood, stability, and sample quality:
+\begin{itemize}
+    \item \textbf{Test Perplexity (PPL):} We report test set perplexity, where lower values indicate better predictive performance.
+    \item \textbf{Objective Stability (Var.\ NELBO):} To quantify training stability, particularly regarding noise schedules, we measure the Variance of the Negative Evidence Lower Bound (lower is better).
+    \item \textbf{Sampling Quality (Gen.PPL):} We evaluate the quality of generated text using Generative Perplexity calculated on 300 samples per model.
+    \item \textbf{Efficiency (NFEs):} We track the Number of Function Evaluations required for generation to measure sampling efficiency.
 \end{itemize}
 
 \section{Reproduction Results}
@@ -132,6 +153,7 @@ Table~\ref{tab:ar_vs_bd3lm_l1} compares token-level AR and BD3-LM with $L'=1$ on
 
 \begin{table}[!htbp]
   \centering
+  \small % Added small for consistency
   \caption{Test perplexities for single-token generation on LM1B (800 training steps).}
   \label{tab:ar_vs_bd3lm_l1}
   \setlength{\tabcolsep}{6pt}
@@ -177,6 +199,7 @@ Table~\ref{tab:clipping_effect} reports PPL and Var.\ NELBO for several $L'$ val
 
 \begin{table}[!htbp]
   \centering
+  \small % Added small for consistency
   \caption{Effect of clipped noise schedules on LM1B (400 pretraining steps + 100 fine-tuning steps).}
   \label{tab:clipping_effect}
   \setlength{\tabcolsep}{5pt}
@@ -204,6 +227,7 @@ Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baseline
 
 \begin{table}[H]
   \centering
+  \small
   \caption{Test perplexities on LM1B (400 pretraining steps + 100 fine-tuning steps).}
   \label{tab:lm1b_main}
   \setlength{\tabcolsep}{10pt}
@@ -229,6 +253,7 @@ Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baseline
 
 \begin{table}[H]
   \centering
+  \small
   \caption{Test perplexities on OWT (3000 pretraining steps + 3000 fine-tuning steps).}
   \label{tab:owt_main}
   \setlength{\tabcolsep}{10pt}
@@ -260,6 +285,7 @@ Table~\ref{tab:transfer} summarizes validation perplexities on other datasets fo
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Zero-shot validation perplexities of models trained on OWT (800 pretraining steps + 800 fine-tuning steps).}
   \label{tab:transfer}
   \setlength{\tabcolsep}{12pt}
@@ -282,6 +308,7 @@ Table~\ref{tab:gen_length_stats} highlights a core benefit of block diffusion ov
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Generation length statistics for 10 sampled documents from OWT-trained models (800 pretraining steps + 500 fine-tuning steps). BD3-LM reproduction with model length $=16$K.}
   \label{tab:gen_length_stats}
   \setlength{\tabcolsep}{6pt}
@@ -304,6 +331,7 @@ We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:samp
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Generative perplexity (Gen.PPL; $\downarrow$) and number of function evaluations (NFEs; $\downarrow$) for 300 samples. Models trained on OWT (400 + 100 training steps).}
   \label{tab:sample_quality}
   \setlength{\tabcolsep}{8pt}
@@ -324,6 +352,7 @@ We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:samp
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Effect of noise schedule on PPL and Var.\ NELBO for different $L'$ on LM1B (5000 + 3000 training steps).}
   \label{tab:noise_schedule_ablation}
   \setlength{\tabcolsep}{6pt}
@@ -358,6 +387,7 @@ Table~\ref{tab:implemented_schedules} summarizes the noise schedules already pro
 
 \begin{table}[H]
   \centering
+  \small
   \caption{Already implemented noise schedules: masked probability $p(t)$ and induced loss scaling.}
   \label{tab:implemented_schedules}
   \setlength{\tabcolsep}{9pt}
@@ -418,16 +448,17 @@ Table~\ref{tab:new_schedules} compares the new schedules to existing ones under 
 
 \begin{table}[!htbp]
   \centering
+  \small % Added small, used tabularx instead of resizebox
   \caption{Already-implemented schedules vs newly implemented Gaussian and bimodal Gaussian (B.G.) schedules on LM1B (400 pretraining steps + 100 fine-tuning steps).}
   \label{tab:new_schedules}
-  \setlength{\tabcolsep}{4pt}
-  \renewcommand{\arraystretch}{1.02}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{c l c c | l c c}
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.1}
+  % Changed to tabularx to fit width naturally without scaling font
+  \begin{tabularx}{\textwidth}{c L c c | L c c}
     \toprule
-    \multirow{2}{*}{Block size} & \multicolumn{3}{c|}{\textbf{Already implemented}} & \multicolumn{3}{c}{\textbf{Newly implemented}} \\
+    \multirow{2}{*}{\shortstack{Block\\size}} & \multicolumn{3}{c|}{\textbf{Already implemented}} & \multicolumn{3}{c}{\textbf{Newly implemented}} \\
     \cmidrule(lr){2-4}\cmidrule(lr){5-7}
-    & Noise schedule & PPL & Var.\ NELBO & Noise schedule & PPL & Var.\ NELBO \\
+    & Noise schedule & PPL & \makecell{Var.\\NELBO} & Noise schedule & PPL & \makecell{Var.\\NELBO} \\
     \midrule
     \multirow{4}{*}{128} & Loglinear & 2106 & 1.27 & Gaussian ($\mu=0.5$) & 2115 & 1.29 \\
     & Loglinear $\mathcal{U}[0,0.5]$ & 2106 & 1.27 & Gaussian ($\mu=0.6$) & 2212 & 1.34 \\
@@ -444,19 +475,20 @@ Table~\ref{tab:new_schedules} compares the new schedules to existing ones under 
     & Cosine & 1228 & 45.28 & B.G. ($\mu_1=0.3,w_1=0.6$) & 1253 & 46.84 \\
     & Cosine $\mathcal{U}[0.5,1]$ & 1229 & 45.26 & B.G. ($\mu_1=0.1,w_1=0.6$) & 1243 & 46.49 \\
     \bottomrule
-  \end{tabular}}
+  \end{tabularx}
 \end{table}
 
 We also tested using the bimodal Gaussian schedule during pretraining; Table~\ref{tab:bg_pretraining} reports the best fine-tuning schedule found per pretraining schedule.
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Applying bimodal Gaussian during pretraining on LM1B: for each pretraining schedule we report the best fine-tuning schedule found (400 pretraining steps + 100 fine-tuning steps).}
   \label{tab:bg_pretraining}
-  \setlength{\tabcolsep}{6pt}
-  \renewcommand{\arraystretch}{1.08}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{c l l r r}
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.1}
+  % Changed to tabularx
+  \begin{tabularx}{\textwidth}{c L L c c}
     \toprule
     Block size & Pretraining schedule & Fine-tuning schedule & PPL & Var.\ NELBO \\
     \midrule
@@ -469,7 +501,7 @@ We also tested using the bimodal Gaussian schedule during pretraining; Table~\re
     \multirow{2}{*}{4} & Loglinear & Loglinear & 1226 & 44.41 \\
     & Bimodal Gaussian & Loglinear & \textbf{1213} & \textbf{44.39} \\
     \bottomrule
-  \end{tabular}}
+  \end{tabularx}
 \end{table}
 
 \section{Extension 2: Loss Reweighting for the Masked Diffusion Objective}
@@ -495,6 +527,7 @@ Table~\ref{tab:reweighting_defs} lists the investigated weighting functions.
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Weighting functions investigated for masked diffusion models (as reported in the final presentation).}
   \label{tab:reweighting_defs}
   \setlength{\tabcolsep}{6pt}
@@ -516,12 +549,13 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
 
 \begin{table}[!htbp]
   \centering
+  \small
   \caption{Test perplexities under different loss reweightings (from the final presentation).}
   \label{tab:reweighted_results}
-  \setlength{\tabcolsep}{3.5pt}
-  \renewcommand{\arraystretch}{1.08}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{lcccccc}
+  \setlength{\tabcolsep}{2pt} % Reduced spacing slightly to fit
+  \renewcommand{\arraystretch}{1.1}
+  % Used tabularx to ensure fit without resizing font
+  \begin{tabularx}{\textwidth}{l Y Y Y Y Y Y}
     \toprule
     & \multicolumn{6}{c}{PPL ($\downarrow$)} \\
     \cmidrule(lr){2-7}
@@ -536,10 +570,10 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
     \midrule
     \multicolumn{7}{l}{\textbf{Block diffusion}} \\
     BD3-LM $L'=16$ & 1345 & 8048.88 & 1593.4 & 1150.15 & 76213 & 53070 \\
-    BD3-LM $L'=8$ & 1210 & 7954.17 & 1569.75 & \textbf{1078.57} & 109169 & 36010741760 \\
-    BD3-LM $L'=4$ & 1176 & 7857.33 & 1565.6 & 1093.7 & 67332 & 2396260 \\
+    BD3-LM $L'=8$ & 1210 & 7954.17 & 1569.75 & \textbf{1078.57} & 109169 & 3.6e10 \\
+    BD3-LM $L'=4$ & 1176 & 7857.33 & 1565.6 & 1093.7 & 67332 & 2.4e6 \\
     \bottomrule
-  \end{tabular}}
+  \end{tabularx}
 \end{table}
 
 In these runs, sigmoid reweighting yields the best PPL for $L'=8$, but several weightings can become unstable (very large perplexities), highlighting the need for careful constraints (e.g., monotonicity conditions with specific schedules).
@@ -561,7 +595,6 @@ We also found that (i) bimodal Gaussian schedules can improve PPL/variance in sp
 Promising next steps include frequency-informed masking (masking rare, information-rich tokens more often), combining both extensions in a single training run, and scaling compute to reduce small-model noise.
 
 \FloatBarrier
-\section*{References}
 \begin{thebibliography}{9}
 \bibitem{bd3lm}
 Arriola, Gokaslan, Chiu, Yang, Qi, Han, Sahoo, Kuleshov.
