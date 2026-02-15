@@ -327,7 +327,9 @@ Table~\ref{tab:gen_length_stats} highlights a core benefit of block diffusion ov
 \end{table}
 
 \subsection{Sample quality and schedule ablations}
-We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:sample_quality}) and (ii) an ablation over noise schedules (Table~\ref{tab:noise_schedule_ablation}).
+We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:sample_quality}) and (ii) an ablation over noise schedules (Table~\ref{tab:noise_schedule_ablation}). \\
+
+\noindent Specifically, in discrete diffusion the NFEs (number of generation steps) is upper bounded by the context length $L$. Thus, our reproduction resembles the paper's experiments. On the other hand, we observe that BD3-LMs achieve better PPL scores faster than their AR counterpart. 
 
 \begin{table}[!htbp]
   \centering
