@@ -22,6 +22,9 @@
 \usepackage[section]{placeins}
 \usepackage{soul}
 
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
 % --- ADDED PACKAGE FOR FIXING TABLE SIZES ---
 \usepackage{tabularx}
 % Define a centered flexible column for tabularx
@@ -53,14 +56,22 @@
 \fancyhead[LO]{Block Diffusion (BD3-LMs): Reproduction and Extensions}
 
 %% Title
-\title{Block Diffusion: Interpolating Between Autoregressive and Diffusion Language Models\\
+\title{Block Diffusion: Interpolating Between Autoregressive and Diffusion Language Models\supercite{arriola2025block}\\
 \vspace{0.25em}
 \large Reproduction Results and Two Practical Extensions}
 
 \author{
-  \textbf{Kordas Nikolaos, Kritharidis Konstantinos, Makras Ilias},\\
-  \textbf{Markoulidakis Georgios, Ntountounakis Georgios, Vitalis Petros}\\
-  National Technical University of Athens
+  \textbf{Nikolaos Kordas$^{1}$ \quad Konstantinos Kritharidis$^{1}$ \quad Ilias Makras$^{1}$} \quad\\
+  \textbf{Georgios Markoulidakis$^{1}$ \quad Georgios Ntountounakis$^{1}$ \quad Petros Vitalis$^{1}$}\\
+  \\
+  Pattern Recognition Course, National Technical University of Athens\\
+  \\
+  Scientific Partner: \textbf{Efthymios Georgiou$^{3}$}\\
+  Course Instructor: \textbf{Alexandros Potamianos$^{1,2}$}\\
+  \\
+  $^{1}$ National Technical University of Athens \\
+  $^{2}$ Archimedes RU, Athena RC \\
+  $^{3}$ University of Bern
 }
 
 \begin{document}
@@ -323,7 +334,7 @@ Table~\ref{tab:gen_length_stats} highlights a core benefit of block diffusion ov
     OWT train set & 717 & 131K \\
     AR & 16384 & 16384 \\
     \midrule
-    SEDD & - & - \\
+    SEDD & 1000 & 1000 \\
     BD3-LM $L'=16$ & 798 & 2927 \\
     \bottomrule
   \end{tabular}
@@ -569,16 +580,16 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
     & Base & IDDPM & EDM & \makecell{Sigmoid\\($k=0$)} & FM & Simple \\
     \midrule
     \multicolumn{7}{l}{\textbf{Autoregressive}} \\
-    Transformer & \multicolumn{6}{c}{1221} \\
+    Transformer & 1221 \\
     \midrule
     \multicolumn{7}{l}{\textbf{Diffusion}} \\
-    SEDD & \multicolumn{6}{c}{1403} \\
-    MDLM & \multicolumn{6}{c}{1370} \\
+    SEDD & 1403 \\
+    MDLM & 1370 \\
     \midrule
     \multicolumn{7}{l}{\textbf{Block diffusion}} \\
-    BD3-LM $L'=16$ & 1345 & 8048.88 & 1593.4 & 1150.15 & 76213 & 53070 \\
-    BD3-LM $L'=8$ & 1210 & 7954.17 & 1569.75 & \textbf{1078.57} & 109169 & 3.6e10 \\
-    BD3-LM $L'=4$ & 1176 & 7857.33 & 1565.6 & 1093.7 & 67332 & 2.4e6 \\
+    BD3-LM $L'=16$ & 1150.15 & 8048.88 & 1593.4 & 1150.15 & 76213 & 53070 \\
+    BD3-LM $L'=8$ & \textbf{1078.57} & 7954.17 & 1569.75 & \textbf{1078.57} & 109169 & 3.6e10 \\
+    BD3-LM $L'=4$ & 1093.7 & 7857.33 & 1565.6 & 1093.7 & 67332 & 2.4e6 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -601,16 +612,8 @@ We also found that (i) bimodal Gaussian schedules can improve PPL/variance in sp
 
 Promising next steps include frequency-informed masking (masking rare, information-rich tokens more often), combining both extensions in a single training run, and scaling compute to reduce small-model noise.
 
-\FloatBarrier
-\begin{thebibliography}{9}
-\bibitem{bd3lm}
-Arriola, Gokaslan, Chiu, Yang, Qi, Han, Sahoo, Kuleshov.
-\newblock \emph{Block Diffusion: Interpolating Between Autoregressive and Diffusion Language Models} (ICLR 2025).
-\newblock Project code: \url{https://github.com/kuleshov-group/bd3lms}.
+\nocite{*}
 
-\bibitem{ourrepo}
-Team 6 (NTUA).
-\newblock Reproduction and extensions repository: \url{https://github.com/ntua-el21050/bd3lms}.
-\end{thebibliography}
+\printbibliography
 
 \end{document}

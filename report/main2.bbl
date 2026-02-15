@@ -1,0 +1,244 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{arriola2025block}{inproceedings}{}
+      \name{author}{8}{}{%
+        {{hash=7682f9cf758f21e1cc063aa4005bae0c}{%
+           family={Arriola},
+           familyi={A\bibinitperiod},
+           given={Marianne},
+           giveni={M\bibinitperiod}}}%
+        {{hash=7c63801f414d01330f1a6f042f3d5ad1}{%
+           family={Sahoo},
+           familyi={S\bibinitperiod},
+           given={Subham\bibnamedelima Sekhar},
+           giveni={S\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=32d646b70ccc5f94db9b60a7773f82c4}{%
+           family={Gokaslan},
+           familyi={G\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod}}}%
+        {{hash=144eba2ed7b8e0747660a7573bd8f157}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Zhihan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=ecd61ce948df23e31e99aed9ee2bd2e2}{%
+           family={Qi},
+           familyi={Q\bibinitperiod},
+           given={Zhixuan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=47b5fd601f98d96888a6a84c1ec4e395}{%
+           family={Han},
+           familyi={H\bibinitperiod},
+           given={Jiaqi},
+           giveni={J\bibinitperiod}}}%
+        {{hash=38518b1f651e2adb1466ae8c36ecc70d}{%
+           family={Chiu},
+           familyi={C\bibinitperiod},
+           given={Justin\bibnamedelima T},
+           giveni={J\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+        {{hash=2e7fab79c30ca590cb9a99af964a32c9}{%
+           family={Kuleshov},
+           familyi={K\bibinitperiod},
+           given={Volodymyr},
+           giveni={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{5f646ba14662ead6c7e5f62fcf2b77f2}
+      \strng{fullhash}{75a040a7cce716bd2cbb52f208e28b42}
+      \strng{bibnamehash}{5f646ba14662ead6c7e5f62fcf2b77f2}
+      \strng{authorbibnamehash}{5f646ba14662ead6c7e5f62fcf2b77f2}
+      \strng{authornamehash}{5f646ba14662ead6c7e5f62fcf2b77f2}
+      \strng{authorfullhash}{75a040a7cce716bd2cbb52f208e28b42}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{The Thirteenth International Conference on Learning Representations}
+      \field{title}{Block Diffusion: Interpolating Between Autoregressive and Diffusion Language Models}
+      \field{year}{2025}
+    \endentry
+    \entry{kosmopoulou-etal-2025-masked}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=92a0e4d68082ec796cb53f1d9722e674}{%
+           family={Kosmopoulou},
+           familyi={K\bibinitperiod},
+           given={Despoina},
+           giveni={D\bibinitperiod}}}%
+        {{hash=323142ab56ff6cb7349e053dfca98923}{%
+           family={Georgiou},
+           familyi={G\bibinitperiod},
+           given={Efthymios},
+           giveni={E\bibinitperiod}}}%
+        {{hash=08e44c5332868efe59071583f9224d60}{%
+           family={Dorovatas},
+           familyi={D\bibinitperiod},
+           given={Vaggelis},
+           giveni={V\bibinitperiod}}}%
+        {{hash=5a60526edbcf1e422bdd317fef9be1ba}{%
+           family={Paraskevopoulos},
+           familyi={P\bibinitperiod},
+           given={Georgios},
+           giveni={G\bibinitperiod}}}%
+        {{hash=2eb58cecf753a66a5aa5c394edd43442}{%
+           family={Potamianos},
+           familyi={P\bibinitperiod},
+           given={Alexandros},
+           giveni={A\bibinitperiod}}}%
+      }
+      \name{editor}{14}{}{%
+        {{hash=85c86621448541d9d3b4a64f1deaa5b2}{%
+           family={Charpentier},
+           familyi={C\bibinitperiod},
+           given={Lucas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=89fc954efd6ee29b7934d732961f3313}{%
+           family={Choshen},
+           familyi={C\bibinitperiod},
+           given={Leshem},
+           giveni={L\bibinitperiod}}}%
+        {{hash=c1b8ad3c54bf37f838e9e90e6b0e26eb}{%
+           family={Cotterell},
+           familyi={C\bibinitperiod},
+           given={Ryan},
+           giveni={R\bibinitperiod}}}%
+        {{hash=2d74b04aefa1913f98bbfc08d41e5e41}{%
+           family={Gul},
+           familyi={G\bibinitperiod},
+           given={Mustafa\bibnamedelima Omer},
+           giveni={M\bibinitperiod\bibinitdelim O\bibinitperiod}}}%
+        {{hash=13f8fdbfde4baedc7bd8f3c9dd359271}{%
+           family={Hu},
+           familyi={H\bibinitperiod},
+           given={Michael\bibnamedelima Y.},
+           giveni={M\bibinitperiod\bibinitdelim Y\bibinitperiod}}}%
+        {{hash=83f95dca7c81df3fe67380769eb0321c}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Jing},
+           giveni={J\bibinitperiod}}}%
+        {{hash=7e5db135b646121bfe5f55e178b0cf64}{%
+           family={Jumelet},
+           familyi={J\bibinitperiod},
+           given={Jaap},
+           giveni={J\bibinitperiod}}}%
+        {{hash=11e9c967573c1c8a0604dda20cf8a914}{%
+           family={Linzen},
+           familyi={L\bibinitperiod},
+           given={Tal},
+           giveni={T\bibinitperiod}}}%
+        {{hash=9ea7a03f6917bb2b03eb1d3e4e47c9f3}{%
+           family={Mueller},
+           familyi={M\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod}}}%
+        {{hash=2330300c09e258fbf1b4ab45c8adb8a2}{%
+           family={Ross},
+           familyi={R\bibinitperiod},
+           given={Candace},
+           giveni={C\bibinitperiod}}}%
+        {{hash=d52b371f9d6db05aad21a1f9ee3c6495}{%
+           family={Shah},
+           familyi={S\bibinitperiod},
+           given={Raj\bibnamedelima Sanjay},
+           giveni={R\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=d97b53c2cf0e9705139aa82b343c3d1d}{%
+           family={Warstadt},
+           familyi={W\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod}}}%
+        {{hash=947c0f00a6913f52d152f3b800b7ffa2}{%
+           family={Wilcox},
+           familyi={W\bibinitperiod},
+           given={Ethan\bibnamedelima Gotlieb},
+           giveni={E\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+        {{hash=d79624dc6e7d48b3c631a4fd694087af}{%
+           family={Williams},
+           familyi={W\bibinitperiod},
+           given={Adina},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Suzhou, China}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computational Linguistics}%
+      }
+      \strng{namehash}{4dc32bb1bb5a1dcbeee0d4a1b2627866}
+      \strng{fullhash}{ad37c75de528ac4f97d1ff9ff4134d1f}
+      \strng{bibnamehash}{4dc32bb1bb5a1dcbeee0d4a1b2627866}
+      \strng{authorbibnamehash}{4dc32bb1bb5a1dcbeee0d4a1b2627866}
+      \strng{authornamehash}{4dc32bb1bb5a1dcbeee0d4a1b2627866}
+      \strng{authorfullhash}{ad37c75de528ac4f97d1ff9ff4134d1f}
+      \strng{editorbibnamehash}{f1e094f14478d8613218722f62756cea}
+      \strng{editornamehash}{f1e094f14478d8613218722f62756cea}
+      \strng{editorfullhash}{f477f4c5634d32fa64b1f54465f1d23b}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the First BabyLM Workshop}
+      \field{month}{11}
+      \field{title}{Masked Diffusion Language Models with Frequency-Informed Training}
+      \field{year}{2025}
+      \true{nocite}
+      \field{pages}{531\bibrangedash 539}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.18653/v1/2025.babylm-main.38
+      \endverb
+    \endentry
+    \entry{shi2025demystifyingdiffusionobjectivesreweighted}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=2b4fd9901f20457c1216777514978c3c}{%
+           family={Shi},
+           familyi={S\bibinitperiod},
+           given={Jiaxin},
+           giveni={J\bibinitperiod}}}%
+        {{hash=ae2c69b23bb338a981c4c4871abba084}{%
+           family={Titsias},
+           familyi={T\bibinitperiod},
+           given={Michalis\bibnamedelima K.},
+           giveni={M\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \strng{namehash}{be13627f600eeda1623e247d7bdeb868}
+      \strng{fullhash}{be13627f600eeda1623e247d7bdeb868}
+      \strng{bibnamehash}{be13627f600eeda1623e247d7bdeb868}
+      \strng{authorbibnamehash}{be13627f600eeda1623e247d7bdeb868}
+      \strng{authornamehash}{be13627f600eeda1623e247d7bdeb868}
+      \strng{authorfullhash}{be13627f600eeda1623e247d7bdeb868}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Demystifying Diffusion Objectives: Reweighted Losses are Better Variational Bounds}
+      \field{year}{2025}
+      \true{nocite}
+      \verb{eprint}
+      \verb 2511.19664
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
