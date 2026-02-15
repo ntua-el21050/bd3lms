@@ -99,7 +99,7 @@
 In this report, we are evaluating the Block Discrete Denoising Diffusion Language
 Models (BD3-LMs), a class of models designed to combine the advantages of Autoregressive (AR) and Discrete Diffusion models.
 BD3-LMs maintain an autoregressive distribution over blocks while performing parallelized discrete diffusion
-within each block. We present a reproduction of the original experiments, as well as \hl{our own} ideas for extensions that improve the performance of BD3-LMs.
+within each block. We present a reproduction of the original experiments, as well as ideas for extensions that improve the performance of BD3-LMs.
 Specifically, we explore two new noise schedules and loss reweighting. Our reproduction
 confirms that BD3-LMs outperform standard diffusion models, achieving variable-length generation
 and high quality sampling efficiency, even under significant resource constraints.
@@ -128,7 +128,7 @@ This hybridization yields:
 \begin{itemize}
   \item \textbf{Parallelism within blocks:} enables faster refinement than strictly token-by-token generation.
   \item \textbf{Autoregressive control across blocks:} enables variable-length generation and mitigates some diffusion limitations.
-  \item \textbf{A single \hl{knob} $L'$:} a direct quality--parallelism trade-off.
+  \item \textbf{Block size parameter $L'$:} a direct trade-off between quality and parallelism.
 \end{itemize}
 
 \section{Background: Masked Discrete Diffusion and Noise Schedules}
@@ -147,7 +147,7 @@ which acts as a weighting of per-token log-likelihood terms across noise levels 
 We consider standard schedules (loglinear, square, square root, logarithmic, cosine) and also investigate clipped schedules, where $t$ is sampled from a restricted interval $\mathcal{U}[\tau_{\min},\tau_{\max}]$.
 
 \section{Experimental Protocol and Metrics}
-To evaluate the efficacy of Block Diffusion models (BD3-LMs) against Autoregressive (AR) and standard Diffusion baselines (SEDD, MDLM), we adopted a \hl{rigorous experimental protocol} tailored to resource-constrained environments.
+To evaluate the efficacy of Block Diffusion models (BD3-LMs) against Autoregressive (AR) and standard Diffusion baselines (SEDD, MDLM), we adapted our experimentation protocol to our resource constraints.
 
 \subsection{Model Configuration and Datasets}
 Due to computational limitations, we utilized a \textbf{tiny} transformer configuration for all models to ensure a fair comparison under identical resource budgets.
@@ -165,10 +165,10 @@ Our training protocol consists of distinct pretraining and fine-tuning phases. T
 \end{itemize}
 
 \subsection{Evaluation Metrics}
-We employed a \hl{comprehensive suite of metrics} to evaluate likelihood, stability, and sample quality:
+We employed a comprehensive set of metrics to evaluate likelihood, stability, and sample quality, following the analysis of the original paper:
 \begin{itemize}
     \item \textbf{Test Perplexity (PPL):} We report test set perplexity, where lower values indicate better predictive performance.
-    \item \textbf{\hl{Objective Stability} (Var.\ NELBO):} To quantify training stability, particularly regarding noise schedules, we measure the Variance of the Negative Evidence Lower Bound \hl{(lower is better)}.
+    \item \textbf{Objective Variance (Var.\ NELBO):} To quantify training stability, particularly regarding noise schedules, we measure the Variance of the Negative Evidence Lower Bound, where again lower values are better.
     \item \textbf{Sampling Quality (Gen.PPL):} We evaluate the quality of generated text using Generative Perplexity calculated on 300 samples per model.
     \item \textbf{Efficiency (NFEs):} We track the Number of Function Evaluations required for generation to measure sampling efficiency.
 \end{itemize}
@@ -454,7 +454,7 @@ Table~\ref{tab:implemented_schedules} summarizes the noise schedules already pro
 \end{table}
 
 \subsection{Gaussian \& Bimodal Gaussian Noise Schedules}
-We propose \hl{\textbf{We should give credit to their paper}} \cite{kosmopoulou-etal-2025-masked} schedules that directly sample the masked probability $p(t)\in(0,1)$.
+As our first extension we adopt two new noise schedules suggested in \cite{kosmopoulou-etal-2025-masked} that directly sample the masked probability $p(t)\in(0,1)$.
 For a (truncated) Gaussian schedule, given mean $\mu$ and standard deviation $\sigma$, define $\alpha=\frac{0-\mu}{\sigma}$, $\beta=\frac{1-\mu}{\sigma}$, $\Phi$ the standard normal CDF, and $\varphi$ the pdf.
 Let $\Phi_{\alpha}=\Phi(\alpha)$, $\Phi_{\beta}=\Phi(\beta)$, and $Z=\Phi_{\beta}-\Phi_{\alpha}$.
 Then for $t\in(0,1)$,
@@ -626,9 +626,9 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
     MDLM & 1370 \\
     \midrule
     \multicolumn{7}{l}{\textbf{Block diffusion}} \\
-    BD3-LM $L'=16$ & 1150.15 & 8048.88 & 1593.4 & 35.02 & 76213 & 53070 \\
-    BD3-LM $L'=8$ & 1078.57 & 7954.17 & 1569.75 & 34.82 & 109169 & 3.6e10 \\
-    BD3-LM $L'=4$ & 1093.7 & 7857.33 & 1565.6 & \textbf{34.08} & 67332 & 2.4e6 \\
+    BD3-LM $L'=16$ & 1150.15 & 279.7 & 51.18 & 35.02 & 74017 & 43488 \\
+    BD3-LM $L'=8$ & 1078.57 & 276.56 & 50.87 & 34.82 & 98147 & 8246395904 \\
+    BD3-LM $L'=4$ & 1093.7 & 276.58 & 46.26 & \textbf{34.08} & 57099 & 1173706 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -647,7 +647,7 @@ Across reproductions and extensions we consistently observe:
 \section{Conclusion and Future Work}
 \FloatBarrier
 Our reproduction supports the main motivation for BD3-LMs: they interpolate between AR and diffusion and, under comparable budgets, can achieve better perplexity and improved sampling quality relative to diffusion baselines, while supporting variable-length generation.
-We also found that (i) bimodal Gaussian schedules can improve PPL/variance in specific settings and (ii) loss reweighting (notably sigmoid weighting in our runs) can yield additional improvements, even though there were unstable results due to overfitting on the small dataset on which we could test.
+We also found that (i) bimodal Gaussian schedules can improve PPL/variance in specific settings and (ii) loss reweighting (notably sigmoid weighting in our runs) can yield additional improvements, even though there were unstable results potentially due to overfitting on the small dataset on which we could test.
 
 Promising next steps include frequency-informed masking (masking rare, information-rich tokens more often), combining both extensions in a single training run, and scaling compute to reduce small-model noise and get more reliable and improved results.
 
