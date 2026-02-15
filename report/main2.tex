@@ -324,8 +324,12 @@ Table~\ref{tab:owt_main} compares AR, diffusion baselines, and BD3LM models on O
 
 On OWT, BD3-LMs are competitive and slightly improve over the AR baseline in our reproduced setting.
 
-\subsection{Transfer evaluation (trained on OWT)}
-Table~\ref{tab:transfer} summarizes validation perplexities on other datasets for models trained on OWT.
+
+\subsection{Zero-Shot Transfer Evaluation(trained on OWT)}
+
+Table~\ref{tab:transfer} evaluates zero-shot generalization: models trained exclusively on OWT are evaluated on held-out datasets without any additional training.
+We focused on three representative datasets: LM1B and Lambada
+which differ substantially from OWT in domain and style and Wikitext, which is structurally similar to OWT as web/encyclopedic text.The paper evaluates on seven benchmarks (PTB, Wikitext, LM1B, Lambada, AG~News, Pubmed, Arxiv).
 
 \begin{table}[!htbp]
   \centering
@@ -347,6 +351,14 @@ Table~\ref{tab:transfer} summarizes validation perplexities on other datasets fo
   \end{tabular}
 \end{table}
 
+Examining Table~\ref{tab:transfer}, BD3-LM's advantage over AR is 
+domain-dependent: it outperforms AR on out-of-domain benchmarks (LM1B, 
+Lambada) but not on similar-domain Wikitext, suggesting that bidirectional 
+denoising learns more transferable representations than next-token prediction. 
+
+At our reduced training scale, two notable differences from the paper's results emerge. Specifically.BD3-LM beats AR, whereas the paper reports the opposite,which we attribute this 
+to BD3-LM's faster convergence under limited training, amplified by the domain shift from OWT to news text. On Lambada, BD3-LM leads, while the 
+paper's winner, MDLM, falls near AR, suggesting that MDLM requires substantially more training to develop the long-range dependencies that BD3-LM's block structure captures more readily, even at a small scale. On Wikitext, both settings agree: AR wins, and BD3-LM outperforms the other diffusion baselines, fully consistent with the paper.
 \subsection{Variable-length generation}
 Table~\ref{tab:gen_length_stats} highlights a core benefit of block diffusion over pure diffusion: longer generations are possible because blocks are generated autoregressively.
 
