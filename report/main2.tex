@@ -156,7 +156,7 @@ Due to computational limitations, we utilized a \textbf{tiny} transformer config
     \item \textbf{Datasets:} We primarily utilized \textbf{LM1B} (One Billion Word Benchmark) and \textbf{OpenWebText (OWT)} for training and perplexity evaluations. For zero-shot transfer evaluation, models trained on OWT were assessed on \textbf{Lambada} and \textbf{Wikitext}.
 \end{itemize}
 
-\subsection{Training Regimen}
+\subsection{Training Configuration}
 Our training protocol consists of distinct pretraining and fine-tuning phases. The specific step counts varied by experiment to balance convergence with compute availability:
 \begin{itemize}
     \item \textbf{Noise Schedule Ablations (LM1B):} 400 pretraining steps followed by 100 fine-tuning steps.
@@ -299,7 +299,7 @@ Table~\ref{tab:owt_main} compares AR, diffusion baselines, and BD3LM models on O
 \begin{table}[H]
   \centering
   \small
-  \caption{Test perplexities on OWT (800 pretraining + 100 fine-tuning steps).}
+  \caption{Test perplexities on OWT (1200 pretraining + 100 fine-tuning steps).}
   \label{tab:owt_main}
   \setlength{\tabcolsep}{12pt}
   \renewcommand{\arraystretch}{1.2}
@@ -330,7 +330,7 @@ Notably, BD3-LM $L'=8$ performs worse than both $L'=4$ and $L'=16$ at 800 traini
 The diffusion,except BD3-LM $L'=8$, baseline ordering SEDD > MDLM > BD3-LM is preserved in both configurations, consistent with the paper.
 
 
-\subsection{Zero-Shot Transfer Evaluation(trained on OWT)}
+\subsection{Zero-Shot Transfer Evaluation (trained on OWT)}
 
 Table~\ref{tab:transfer} evaluates zero-shot generalization: models trained exclusively on OWT are evaluated on held-out datasets without any additional training.
 We focused on three representative datasets: LM1B and Lambada
@@ -397,7 +397,7 @@ We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:samp
 \begin{table}[!htbp]
   \centering
   \small
-  \caption{Generative perplexity (Gen.PPL; $\downarrow$) and number of function evaluations (NFEs; $\downarrow$) for 300 samples. Models trained on OWT (400 + 100 training steps).}
+  \caption{Generative perplexity (Gen.PPL; $\downarrow$) and number of function evaluations (NFEs; $\downarrow$) for 300 samples. Models trained on OWT (400 pretraining steps + 100 fine-tuning steps).}
   \label{tab:sample_quality}
   \setlength{\tabcolsep}{8pt}
   \renewcommand{\arraystretch}{1.1}
@@ -418,7 +418,7 @@ We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:samp
 \begin{table}[!htbp]
   \centering
   \small
-  \caption{Effect of noise schedule on PPL and Var.\ NELBO for different $L'$ on LM1B (5000 + 3000 training steps).}
+  \caption{Effect of noise schedule on PPL and Var.\ NELBO for different $L'$ on LM1B (5000 pretraining steps + 3000 fine-tuning steps).}
   \label{tab:noise_schedule_ablation}
   \setlength{\tabcolsep}{6pt}
   \renewcommand{\arraystretch}{1.05}
@@ -681,7 +681,7 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
 
 We observe that reweighting can significantly improve the test perplexity (IDDPM, EDM and Sigmoid improve over Base), with the most notable improvements achieved with EDM and Sigmoid reweighting. Sigmoid reweighting yields the best PPL for $L'=4$, far surpassing the base model by orders of magnitude!\\
 \\
-We also notice that some weightings can become unstable (very large perplexities). In most runs with reweighting, the validation loss dropped quickly and then started increasing, so we could potentially interpret this phenomenon as overfitting caused by the small dataset and enhanced due to the faster learning of the reweighted objectives. Indeed, keeping the model with best performance instead of the one from the last training step significantly improved the test perplexity with reweighting. However, FM and Simple in particular exhibit exceedingly high test perplexities, which indicate that the training my fail to converge at all, which could be due to the small number of training steps
+We also notice that some weightings can become unstable (very large perplexities). In most runs with reweighting, the validation loss dropped quickly and then started increasing, so we could potentially interpret this phenomenon as overfitting caused by the small dataset and enhanced due to the faster learning of the reweighted objectives. Indeed, keeping the model with best performance instead of the one from the last training step significantly improved the test perplexity with reweighting. However, FM and Simple in particular exhibit exceedingly high test perplexities, which indicate that the training my fail to converge at all, which could be due to the small number of training steps.
 
 \section{Discussion}
 \FloatBarrier
