@@ -426,7 +426,36 @@ We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:samp
   \end{tabular}
 \end{table}
 
-The ablation supports the presentation takeaway: clipped schedules reliably reduce variance, but standard schedules can yield lower perplexity given enough training.
+Table 8 highlights a clear and consistent pattern 
+across both block sizes: clipped schedules reliably reduce the variance of the NELBO 
+gradient estimator by an order of magnitude compared to standard schedules, with 
+heavier clipping producing systematically lower variance. This confirms that extreme 
+mask rates introduce high gradient variance and that clipping the sampling range 
+effectively stabilizes training. 
+However, while the variance ranking is faithfully 
+reproduced, the PPL ranking is inverted at our scale: standard schedules achieve 
+substantially lower perplexity than clipped schedules for both $L'=4$ and $L'=16$, 
+contrary to the paper's ordering. We strongly believe this inversion is primarily 
+due to insufficient training. Clipped schedules reduce gradient variance to improve 
+long-term convergence stability, but standard schedules expose the model to the full 
+range of noise levels from the outset, enabling faster initial learning. At our limited 
+training budget, the models have simply not trained long enough for the variance 
+advantage to compound into a measurable PPL improvement. Standard schedules 
+consistently outperform clipped ones in PPL at our scale for both block sizes, and 
+the relative ordering among them is largely preserved from the paper, with the 
+exception of Square, which benefits notably from limited training budgets.
+
+Regarding block-size-specific masking, our results for $L'=4$ confirm that heavy 
+masking ($\mathcal{U}[0.45,0.95]$) achieves the lowest variance among all schedules, 
+consistent with the intuition that small blocks, having limited context, benefit from 
+aggressive masking; however, this variance advantage has not yet translated into superior 
+PPL at our training scale. 
+For $L'=16$, $\mathcal{U}[0.3,0.8]$ substantially outperforms 
+$\mathcal{U}[0.45,0.95]$ in PPL, partially supporting the prediction that larger 
+blocks prefer lighter masking, but $\mathcal{U}[0.45,0.95]$ still achieves the lower 
+variance, and standard schedules outperform both clipped schedules in PPL. As with the 
+overall PPL inversion, we attribute these discrepancies to the limited training budget.
+
 
 \section{Extension 1: Alternative Noise Schedules}
 \FloatBarrier
