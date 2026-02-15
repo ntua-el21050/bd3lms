@@ -20,6 +20,7 @@
 \usepackage{float}
 \usepackage{flafter}
 \usepackage[section]{placeins}
+\usepackage{soul}
 
 % --- ADDED PACKAGE FOR FIXING TABLE SIZES ---
 \usepackage{tabularx}
@@ -69,7 +70,7 @@
 In this report, we are evaluating the Block Discrete Denoising Diffusion Language
 Models (BD3-LMs), a class of models designed to combine the advantages of Autoregressive (AR) and Discrete Diffusion models.
 BD3-LMs maintain an autoregressive distribution over blocks while performing parallelized discrete diffusion
-within each block. We present a reproduction of the original experiments, as well as our own ideas for extensions that improve the performance of BD3-LMs.
+within each block. We present a reproduction of the original experiments, as well as \hl{our own} ideas for extensions that improve the performance of BD3-LMs.
 Specifically, we explore two new noise schedules and loss reweighting. Our reproduction
 confirms that BD3-LMs outperform standard diffusion models, achieving variable-length generation
 and high quality sampling efficiency, even under significant resource constraints.
@@ -83,9 +84,9 @@ of this class of models for efficient language generation.
 \section{Introduction}
 Modern language models are typically built using one of two generation paradigms.
 \emph{Autoregressive} (AR) models generate one token at a time, which empirically yields strong likelihoods and high sample quality, supports key-value (KV) caching, and naturally allows variable-length generation.
-\emph{Diffusion} models instead aim to generate (or refine) many tokens in parallel through iterative denoising steps, which can improve controllability and parallelism, but often suffers from a perplexity gap and typically targets fixed-length outputs.
+\emph{Diffusion} models instead aim to generate (or refine) many tokens in parallel through iterative denoising steps, which can improve controllability and parallelism, but often suffers from a perplexity gap and is limited to fixed-length outputs.
 
-Block diffusion (BD3-LMs) is a hybrid: it is autoregressive over blocks and diffusion-like within each block.
+Block diffusion (BD3-LMs) is a hybrid: it is autoregressive over blocks and performs diffusion within each block.
 This design targets a controllable trade-off between quality and parallelism via the block size $L'$.
 At the extremes, $L'=1$ reduces to token-level AR, while $L'=L$ (the full sequence length) becomes a fully parallel diffusion model.
 
@@ -98,7 +99,7 @@ This hybridization yields:
 \begin{itemize}
   \item \textbf{Parallelism within blocks:} enables faster refinement than strictly token-by-token generation.
   \item \textbf{Autoregressive control across blocks:} enables variable-length generation and mitigates some diffusion limitations.
-  \item \textbf{A single knob $L'$:} a direct quality--parallelism trade-off.
+  \item \textbf{A single \hl{knob} $L'$:} a direct quality--parallelism trade-off.
 \end{itemize}
 
 \section{Background: Masked Discrete Diffusion and Noise Schedules}
@@ -117,7 +118,7 @@ which acts as a weighting of per-token log-likelihood terms across noise levels 
 We consider standard schedules (loglinear, square, square root, logarithmic, cosine) and also investigate clipped schedules, where $t$ is sampled from a restricted interval $\mathcal{U}[\tau_{\min},\tau_{\max}]$.
 
 \section{Experimental Protocol and Metrics}
-To evaluate the efficacy of Block Diffusion models (BD3-LMs) against Autoregressive (AR) and standard Diffusion baselines (SEDD, MDLM), we adopted a rigorous experimental protocol tailored to resource-constrained environments.
+To evaluate the efficacy of Block Diffusion models (BD3-LMs) against Autoregressive (AR) and standard Diffusion baselines (SEDD, MDLM), we adopted a \hl{rigorous experimental protocol} tailored to resource-constrained environments.
 
 \subsection{Model Configuration and Datasets}
 Due to computational limitations, we utilized a \textbf{tiny} transformer configuration for all models to ensure a fair comparison under identical resource budgets.
@@ -135,16 +136,18 @@ Our training protocol consists of distinct pretraining and fine-tuning phases. T
 \end{itemize}
 
 \subsection{Evaluation Metrics}
-We employed a comprehensive suite of metrics to evaluate likelihood, stability, and sample quality:
+We employed a \hl{comprehensive suite of metrics} to evaluate likelihood, stability, and sample quality:
 \begin{itemize}
     \item \textbf{Test Perplexity (PPL):} We report test set perplexity, where lower values indicate better predictive performance.
-    \item \textbf{Objective Stability (Var.\ NELBO):} To quantify training stability, particularly regarding noise schedules, we measure the Variance of the Negative Evidence Lower Bound (lower is better).
+    \item \textbf{\hl{Objective Stability} (Var.\ NELBO):} To quantify training stability, particularly regarding noise schedules, we measure the Variance of the Negative Evidence Lower Bound \hl{(lower is better)}.
     \item \textbf{Sampling Quality (Gen.PPL):} We evaluate the quality of generated text using Generative Perplexity calculated on 300 samples per model.
     \item \textbf{Efficiency (NFEs):} We track the Number of Function Evaluations required for generation to measure sampling efficiency.
 \end{itemize}
 
 \section{Reproduction Results}
-\FloatBarrier
+
+Below, we reproduce all tables from the original paper.
+
 \subsection{AR vs BD3-LM with $L'=1$}
 The first experiment we reproduced, was the comparison between AR and BD3-LM models with block size equal to 1.
 As the authors of the original paper explain, the expected value of the variance NELBO of the AR and the BD3-LM with $L'=1$ are equal. What the authors found though, was that in practice the AR achieves better perplexity score than the BD3-LM. They explained that this was due to higher training variance in the BD3-LM's case. Using their default Log-linear noise schedule, meant that only half of the tokens would be masked. As a result the training cross-entropy would not be computed for half the tokens. They managed to overcome this, by setting the mask probability equal to 1, using a tuned schedule where $t\sim\mathcal{U}[1,1]$.
@@ -318,13 +321,15 @@ Table~\ref{tab:gen_length_stats} highlights a core benefit of block diffusion ov
     & \makecell{Median\\\# tokens} & \makecell{Max\\\# tokens} \\
     \midrule
     OWT train set & 717 & 131K \\
-    AR & 4008 & 131K \\
+    AR & 16384 & 16384 \\
     \midrule
-    SEDD & 1021 & 1024 \\
+    SEDD & - & - \\
     BD3-LM $L'=16$ & 798 & 2927 \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+We observe that, indeed, BD3-LMs overcome the fixed-length generation limitation of diffusion models, creating outputs that can go well-beyond the context length of their training (1024). However, still the AR model achieves far longer generation, as happens in the original papers as well. The fact that the median number of tokens in the AR model is equal to the maximum number of tokens, is explained by the fact that with only 800 training steps, the AR model doesn't have the time to properly train, and as a result, doesn't learn when to stop generating outputs. This is in accordance to our empirical evaluation of the quality of the generation results, which was poor for the AR model but far better for the BD3-LM (with 800 pretraining and 500 fine-tuning steps).
 
 \subsection{Sample quality and schedule ablations}
 We report (i) sampling quality in terms of Gen.PPL and NFEs (Table~\ref{tab:sample_quality}) and (ii) an ablation over noise schedules (Table~\ref{tab:noise_schedule_ablation}). \\
