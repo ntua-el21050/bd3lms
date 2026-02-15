@@ -717,14 +717,25 @@ class DIT(nn.Module, huggingface_hub.PyTorchModelHubMixin):
       raise ValueError('Unknown attention backend')
     
   def reset_kv_cache(self):
+    """Reset kv-cache state for fast sampling.
+
+    Note: causal (AR) blocks and non-causal blocks use different cache formats.
+    - Causal (`DDiTBlockCausal`) caches a growing QKV tensor and expects `kv_cache=None` at start.
+    - Non-causal (`DDiTBlock`) uses a preallocated buffer + `cache_idx`.
+    """
     for block in self.blocks:
-      block.kv_cache = torch.zeros(
-        self.config.loader.eval_batch_size,
-        self.max_seqlen,
-        self.config.model.hidden_size * 3,
-        device='cuda',
-        dtype=torch.bfloat16)
-      block.cache_idx = 0
+      if self.causal:
+        block.kv_cache = None
+        if hasattr(block, 'cache_idx'):
+          block.cache_idx = 0
+      else:
+        block.kv_cache = torch.zeros(
+          self.config.loader.eval_batch_size,
+          self.max_seqlen,
+          self.config.model.hidden_size * 3,
+          device='cuda',
+          dtype=torch.bfloat16)
+        block.cache_idx = 0
 
   def forward(self, indices, sigma, sample_mode=False, store_kv=False):
     x = self.vocab_embed(indices)
