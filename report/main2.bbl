@@ -199,7 +199,6 @@
       \field{month}{11}
       \field{title}{Masked Diffusion Language Models with Frequency-Informed Training}
       \field{year}{2025}
-      \true{nocite}
       \field{pages}{531\bibrangedash 539}
       \range{pages}{9}
       \verb{doi}
@@ -233,7 +232,6 @@
       \field{eprinttype}{arXiv}
       \field{title}{Demystifying Diffusion Objectives: Reweighted Losses are Better Variational Bounds}
       \field{year}{2025}
-      \true{nocite}
       \verb{eprint}
       \verb 2511.19664
       \endverb

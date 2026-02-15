@@ -49,6 +49,24 @@
   }%
 }
 
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\vx}{\mathbf{x}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\vz}{\mathbf{z}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\beps}{\bm{\epsilon}}
+\newcommand{\softmax}{\mathrm{softmax}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\z}[1]{\bz_{t({#1})}}
+\newcommand{\zs}[1]{\bz_{s({#1})}}
+\newcommand{\kl}{\mathrm{KL}}
+\newcommand{\KL}[2]{\mathrm{KL}({#1}\|{#2})}
+\newcommand{\snr}{\text{SNR}}
+\newcommand{\twonorm}[1]{\|{#1}\|_2}
+\newcommand{\diff}{\mathop{}\!\mathrm{d}}
+
+
 % Header
 \pagestyle{fancy}
 \thispagestyle{empty}
@@ -424,7 +442,7 @@ Table~\ref{tab:implemented_schedules} summarizes the noise schedules already pro
 \end{table}
 
 \subsection{Gaussian \& Bimodal Gaussian Noise Schedules}
-We propose schedules that directly sample the masked probability $p(t)\in(0,1)$.
+We propose \hl{\textbf{We should give credit to their paper}} \cite{kosmopoulou-etal-2025-masked} schedules that directly sample the masked probability $p(t)\in(0,1)$.
 For a (truncated) Gaussian schedule, given mean $\mu$ and standard deviation $\sigma$, define $\alpha=\frac{0-\mu}{\sigma}$, $\beta=\frac{1-\mu}{\sigma}$, $\Phi$ the standard normal CDF, and $\varphi$ the pdf.
 Let $\Phi_{\alpha}=\Phi(\alpha)$, $\Phi_{\beta}=\Phi(\beta)$, and $Z=\Phi_{\beta}-\Phi_{\alpha}$.
 Then for $t\in(0,1)$,
@@ -524,24 +542,33 @@ We also tested using the bimodal Gaussian schedule during pretraining; Table~\re
 
 \section{Extension 2: Loss Reweighting for the Masked Diffusion Objective}
 \FloatBarrier
-A second direction is to reweight the masked diffusion NELBO.
-Starting from a weighted objective
-\begin{equation}
-  \mathcal{L}^{\tilde{w}}(\mathbf{x})
-  = -\int_{0}^{1} \tilde{w}(t)\,\frac{\alpha'_t}{1-\alpha_t}
-  \mathbb{E}_{q(\mathbf{z}_t\mid\mathbf{x})}\left[\delta_{\mathbf{z}_t,m}\cdot \mathbf{x}^{\top}\log\mu_{\theta}(\mathbf{z}_t)\right] \mathrm{d}t,
-\end{equation}
-we can reparameterize via $\lambda(t)=\log\frac{\alpha_t}{1-\alpha_t}$ and express weighting in the $\lambda$ domain.
-We evaluated multiple weightings migrated from continuous-time diffusion and a simple baseline weighting.
+As our second extension we adopt the reweighting technique suggested in \cite{shi2025demystifyingdiffusionobjectivesreweighted} for the masked diffusion NELBO.\\
+\\
+The authors start by proving two main theorems. Theorem 1 states that more "optimal" reverse steps lead to better ELBOs, where more "optimal" means using the ground truth reverse transition instead of our learned denoiser. Theorem 2 states that common diffusion objectives are a weighted sum of the improved ELBOs.\\
 
 \begin{figure}[!htbp]
-  \centering
-  \safeincludegraphics[width=0.95\linewidth]{reweighting.png}
-  \caption{Illustration of reweighting schemes (from the final presentation).}
-  \label{fig:reweighting}
+	\centering
+	\safeincludegraphics[width=0.75\linewidth]{reweighting.png}
+	\caption{Figure taken from \cite{shi2025demystifyingdiffusionobjectivesreweighted}: Diffusion objectives viewed as a weighted sum of the ELBOs of a sequence of models with optimal decoders}
+	\label{fig:reweighting}
 \end{figure}
 
-Table~\ref{tab:reweighting_defs} lists the investigated weighting functions.
+Finally, for discrete diffusion models, the authors note that adding a reweighting term $\tilde{w}(t)$ like this:
+\begin{equation}
+	\cL^{\tilde{w}}(\bx) = -\int_{0}^{1}{\tilde{w}({t})
+	}\frac{\alpha_{t}'}{1 - \alpha_{t}}\E_{q(\bz_t|\bx)}\left[\delta
+	_{\bz_t, m}\cdot \bx^{\top}\log \mu_{\theta}(\bz_{t})\right]
+	\diff t
+\end{equation}
+the reparameterization invariance with respect to the log-SNR that holds without reweighting breaks. Their proposed way of solving that, is by defining the reweighting term with respect to the log-SNR $\lambda(t)=\log\frac{\alpha_t}{1-\alpha_t}$ instead of time $t$, so that the loss remains invariant under the change of variable:
+\begin{equation}
+	\cL^{\hat{w}}(\bx) = -\int_{0}^{1}{\hat{w}({\lambda(t)})
+	}\frac{\alpha_{t}'}{1 - \alpha_{t}}\E_{q(\bz_t|\bx)}\left[\delta
+	_{\bz_t, m}\cdot \bx^{\top}\log \mu_{\theta}(\bz_{t})\right]
+	\diff t
+\end{equation}
+
+Table~\ref{tab:reweighting_defs} lists the investigated weighting functions. In all reweighting terms except "Simple", the reparameterized version was used.
 
 \begin{table}[!htbp]
   \centering
@@ -594,23 +621,23 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
   \end{tabularx}
 \end{table}
 
-In these runs, sigmoid reweighting yields the best PPL for $L'=8$, but several weightings can become unstable (very large perplexities), highlighting the need for careful constraints (e.g., monotonicity conditions with specific schedules).
+In these runs, sigmoid reweighting yields the best PPL for $L'=4$, far surpassing the base model without reweighting! Several weightings can become unstable (very large perplexities). We notice that the validation loss with reweighting often drops quickly and then starts increasing, so we interpret this phenomenon as overfitting caused by the small dataset and enhanced due to the faster learning of the reweighted objectives.
 
 \section{Discussion}
 \FloatBarrier
 Across reproductions and extensions we consistently observe:
 \begin{itemize}
   \item \textbf{Smaller blocks help perplexity:} decreasing $L'$ often improves PPL, consistent with approaching the AR regime.
-  \item \textbf{Variance--PPL trade-off:} clipped schedules reduce Var.\ NELBO, but the best perplexity can come from standard schedules after sufficient optimization.
+  \item \textbf{Variance--PPL trade-off:} clipped schedules reduce Var.\ NELBO, \hl{but the best perplexity can come from standard schedules after sufficient optimization.}
   \item \textbf{Length behavior differs qualitatively:} BD3-LMs can exceed fixed-length diffusion caps because generation proceeds block-by-block.
 \end{itemize}
 
 \section{Conclusion and Future Work}
 \FloatBarrier
-Our reproduction supports the main motivation for BD3-LMs: they interpolate between AR and diffusion and, under comparable budgets, can achieve strong perplexity and improved sampling quality relative to diffusion baselines, while retaining variable-length generation.
-We also found that (i) bimodal Gaussian schedules can improve PPL/variance in specific settings and (ii) loss reweighting (notably sigmoid weighting in our runs) can yield additional improvements but may be unstable.
+Our reproduction supports the main motivation for BD3-LMs: they interpolate between AR and diffusion and, under comparable budgets, can achieve better perplexity and improved sampling quality relative to diffusion baselines, while supporting variable-length generation.
+We also found that (i) bimodal Gaussian schedules can improve PPL/variance in specific settings and (ii) loss reweighting (notably sigmoid weighting in our runs) can yield additional improvements, even though there were unstable results due to overfitting on the small dataset on which we could test.
 
-Promising next steps include frequency-informed masking (masking rare, information-rich tokens more often), combining both extensions in a single training run, and scaling compute to reduce small-model noise.
+Promising next steps include frequency-informed masking (masking rare, information-rich tokens more often), combining both extensions in a single training run, and scaling compute to reduce small-model noise and get more reliable and improved results.
 
 \nocite{*}
 

@@ -2362,7 +2362,11 @@
   </bcf:bibdata>
   <bcf:section number="0">
     <bcf:citekey order="1" intorder="1">arriola2025block</bcf:citekey>
-    <bcf:citekey order="2" intorder="1" nocite="1">*</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">kosmopoulou-etal-2025-masked</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">shi2025demystifyingdiffusionobjectivesreweighted</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">shi2025demystifyingdiffusionobjectivesreweighted</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">shi2025demystifyingdiffusionobjectivesreweighted</bcf:citekey>
+    <bcf:citekey order="6" intorder="1" nocite="1">*</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">
