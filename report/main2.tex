@@ -585,7 +585,7 @@ Table~\ref{tab:reweighting_defs} lists the investigated weighting functions. In 
 \begin{table}[!htbp]
   \centering
   \small
-  \caption{Weighting functions investigated for masked diffusion models (as reported in the final presentation).}
+  \caption{Weighting functions investigated for masked diffusion models.}
   \label{tab:reweighting_defs}
   \setlength{\tabcolsep}{6pt}
   \renewcommand{\arraystretch}{1.15}
@@ -607,7 +607,7 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
 \begin{table}[!htbp]
   \centering
   \small
-  \caption{Test perplexities under different loss reweightings (from the final presentation).}
+  \caption{Test perplexities under different loss reweightings (800 pretraining steps + 800 fine-tuning steps).}
   \label{tab:reweighted_results}
   \setlength{\tabcolsep}{2pt} % Reduced spacing slightly to fit
   \renewcommand{\arraystretch}{1.1}
@@ -626,14 +626,16 @@ Finally, Table~\ref{tab:reweighted_results} reports the test perplexities for th
     MDLM & 1370 \\
     \midrule
     \multicolumn{7}{l}{\textbf{Block diffusion}} \\
-    BD3-LM $L'=16$ & 1150.15 & 279.7 & 51.18 & 35.02 & 74017 & 43488 \\
-    BD3-LM $L'=8$ & 1078.57 & 276.56 & 50.87 & 34.82 & 98147 & 8246395904 \\
-    BD3-LM $L'=4$ & 1093.7 & 276.58 & 46.26 & \textbf{34.08} & 57099 & 1173706 \\
+    BD3-LM $L'=16$ & 1405 & 279.7 & 51.18 & 35.57 & 74017 & 43488 \\
+    BD3-LM $L'=8$ & 1204 & 276.56 & 50.87 & 34.44 & 98147 & 8246395904 \\
+    BD3-LM $L'=4$ & 1204 & 276.58 & 46.26 & \textbf{33.16} & 57099 & 1173706 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-In these runs, sigmoid reweighting yields the best PPL for $L'=4$, far surpassing the base model without reweighting! Several weightings can become unstable (very large perplexities). We notice that the validation loss with reweighting often drops quickly and then starts increasing, so we interpret this phenomenon as overfitting caused by the small dataset and enhanced due to the faster learning of the reweighted objectives.
+We observe that reweighting can significantly improve the test perplexity (IDDPM, EDM and Sigmoid improve over Base), with the most notable improvements achieved with EDM and Sigmoid reweighting. Sigmoid reweighting yields the best PPL for $L'=4$, far surpassing the base model by orders of magnitude!\\
+\\
+We also notice that some weightings can become unstable (very large perplexities). In most runs with reweighting, the validation loss dropped quickly and then started increasing, so we could potentially interpret this phenomenon as overfitting caused by the small dataset and enhanced due to the faster learning of the reweighted objectives. Indeed, keeping the model with best performance instead of the one from the last training step significantly improved the test perplexity with reweighting. However, FM and Simple in particular exhibit exceedingly high test perplexities, which indicate that the training my fail to converge at all, which could be due to the small number of training steps
 
 \section{Discussion}
 \FloatBarrier
@@ -647,7 +649,7 @@ Across reproductions and extensions we consistently observe:
 \section{Conclusion and Future Work}
 \FloatBarrier
 Our reproduction supports the main motivation for BD3-LMs: they interpolate between AR and diffusion and, under comparable budgets, can achieve better perplexity and improved sampling quality relative to diffusion baselines, while supporting variable-length generation.
-We also found that (i) bimodal Gaussian schedules can improve PPL/variance in specific settings and (ii) loss reweighting (notably sigmoid weighting in our runs) can yield additional improvements, even though there were unstable results potentially due to overfitting on the small dataset on which we could test.
+We also found that (i) bimodal Gaussian schedules can improve PPL/variance in specific settings and (ii) loss reweighting (notably Sigmoid and EDM in our runs, as well as IDDPM) can yield significant improvements, even though there were some unstable results potentially due to our limited computational resources.
 
 Promising next steps include frequency-informed masking (masking rare, information-rich tokens more often), combining both extensions in a single training run, and scaling compute to reduce small-model noise and get more reliable and improved results.
 
