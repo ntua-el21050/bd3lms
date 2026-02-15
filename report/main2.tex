@@ -642,7 +642,7 @@ We also notice that some weightings can become unstable (very large perplexities
 Across reproductions and extensions we consistently observe:
 \begin{itemize}
   \item \textbf{Smaller blocks help perplexity:} decreasing $L'$ often improves PPL, consistent with approaching the AR regime.
-  \item \textbf{Variance--PPL trade-off:} clipped schedules reduce Var.\ NELBO, \hl{but the best perplexity can come from standard schedules after sufficient optimization.}
+  \item \textbf{Variance--PPL correlation:} we observed positive correlation between Var.\ NELBO and perplexity across training schedules. In well-tuned regimes, reductions in variance are typically accompanied by corresponding improvements in perplexity.
   \item \textbf{Length behavior differs qualitatively:} BD3-LMs can exceed fixed-length diffusion caps because generation proceeds block-by-block.
 \end{itemize}
 
