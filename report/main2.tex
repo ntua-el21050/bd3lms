@@ -237,7 +237,17 @@ Table~\ref{tab:clipping_effect} reports PPL and Var.\ NELBO for several $L'$ val
 Under our reproduced settings, clipping is most clearly beneficial for $L'=16$ (small but consistent improvements in both PPL and variance), whereas for $L'=4$ and $L'=128$ the effect is negligible.
 
 \subsection{LM1B and OWT comparisons}
-Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baselines, and BD3-LM variants.
+Table~\ref{tab:lm1b_main} compares AR, diffusion baselines, and BD3LM
+models pre-trained using block size L' = 128 and
+fine-tuned under varying L' on the LM1B Dataset. We observe a performance gap with regards 
+to the AR model
+between our experiment and the one presented in the original paper. Specifically,
+our reproduced AR is the worst performing model on LM1B, whereas it achieves best performance in
+the original paper. The gap is due to our limited resources and therefore our inability to train the model
+for more gradient steps.
+However, we can still see that the best BD3LM model in our reproduction is the one with $L'=4$, which
+is also true in the original paper. Additionally, the BD3-LMs outperform the diffusion baselines, with the exception of
+$L'=8$, which performed significantly worse, also due to resource constraints.
 
 \begin{table}[H]
   \centering
@@ -265,6 +275,9 @@ Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baseline
   \end{tabular}
 \end{table}
 
+Table~\ref{tab:owt_main} compares AR, diffusion baselines, and BD3LM models on OWT.
+
+
 \begin{table}[H]
   \centering
   \small
@@ -291,7 +304,6 @@ Tables~\ref{tab:lm1b_main} and~\ref{tab:owt_main} compare AR, diffusion baseline
   \end{tabular}
 \end{table}
 
-On LM1B, BD3-LMs outperform the diffusion baselines under the same training budget.
 On OWT, BD3-LMs are competitive and slightly improve over the AR baseline in our reproduced setting.
 
 \subsection{Transfer evaluation (trained on OWT)}
