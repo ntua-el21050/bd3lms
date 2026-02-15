@@ -1,4 +1,26 @@
-# [Block Diffusion: Interpolating Between Autoregressive and Diffusion Language Models](https://arxiv.org/abs/2503.09573) (ICLR 2025 Oral)
+# Block Diffusion: Interpolating Between Autoregressive and Diffusion Language Models
+
+## Reproduction Results and Two Practical Extensions
+
+**Nikolaos Kordas<sup>1</sup>, Konstantinos Kritharidis<sup>1</sup>, Ilias Makras<sup>1</sup>, Georgios Markoulidakis<sup>1</sup>, Georgios Ntountounakis<sup>1</sup>, Petros Vitalis<sup>1</sup>**
+
+Pattern Recognition Course, National Technical University of Athens
+
+Scientific Partner: **Efthymios Georgiou<sup>3</sup>**<br>
+Course Instructor: **Alexandros Potamianos<sup>1, 2</sup>**
+
+<sup>1</sup> National Technical University of Athens<br>
+<sup>2</sup> Archimedes RU, Athena RC<br>
+<sup>3</sup> University of Bern<br>
+
+[Interim Presentation](https://github.com/ntua-el21050/bd3lms/blob/main/midterm_presentation_pattern_recognition%20(5).pdf): Paper Overview and Initial Reproduction<br>
+[Final Presentation](https://github.com/ntua-el21050/bd3lms/blob/main/final_presentation/main.pdf): Final Reproduction and Extensions<br>
+[Project Report](https://github.com/ntua-el21050/bd3lms/blob/main/report/main.pdf): Final Project Report
+
+We note that in the Project Report, some amendments were made to Tables 4, 6 and Extension 2 Results, to make them more full and compatible with the rest of the results.
+
+## Original Paper ([**ICLR 2025 Oral**](https://arxiv.org/abs/2503.09573))
+
 By [Marianne Arriola](https://m-arriola.com/), [Aaron Gokaslan](https://skylion007.github.io), [Justin T Chiu](https://justinchiu.netlify.app), [Zhihan Yang](https://zhihanyang2022.github.io/), [Zhixuan Qi](https://zhixuanqi.com/), [Jiaqi Han](https://hanjq17.github.io/), [Subham Sekhar Sahoo](https://s-sahoo.github.io), [Volodymyr Kuleshov](https://www.cs.cornell.edu/~kuleshov/)
 
 <!-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/18nC6q7dWq154fI1BXPLwmtnS7Zvbrv6p?usp=sharing/) -->
@@ -46,7 +68,7 @@ In this repo, we provide:
 
 <a name="getting_started"></a>
 
-## Getting Started
+### Getting Started
 
 To get started, create a conda environment containing the required dependencies.
 
@@ -66,7 +88,7 @@ and run the training as a batch job:
 sbatch scripts/train/train_owt_bd3lm.sh
 ```
 
-### Checkpoints
+#### Checkpoints
 
 We have uploaded BD3-LMs trained on OpenWebText using block sizes 4, 8, 16 for 1M training steps to HuggingFace 🤗:
 [kuleshov-group/bd3-lms](https://huggingface.co/collections/kuleshov-group/bd3-lms-67be95f81b96b15fec50d53f) BD3-LMs are finetuned from an MDLM checkpoint trained on OpenWebText for 850K gradient updates. We release the pretraining checkpoint on HuggingFace: [kuleshov-group/bd3lm-owt-block_size1024-pretrain](https://huggingface.co/kuleshov-group/bd3lm-owt-block_size1024-pretrain)
@@ -77,17 +99,17 @@ The MDLM baseline is also found on the HuggingFace:
 
 For arbitrary-length sequence generation, we compare with AR, SEDD, and MDLM (supported as an inference-only technique and does not feature a training objective), and SSD-LM. In order to generate sequences longer than the training context size (fixed at 1024 tokens for OWT), we retrained AR and MDLM from Sahoo et. al without artificially injecting BOS/EOS tokens in the context. We also provide these checkpoints on HuggingFace: [kuleshov-group/mdlm-noeos-owt](https://huggingface.co/kuleshov-group/mdlm-noeos-owt), [kuleshov-group/sedd-noeos-owt](https://huggingface.co/kuleshov-group/sedd-noeos-owt), [kuleshov-group/ar-noeos-owt](https://huggingface.co/kuleshov-group/ar-noeos-owt).
 
-## Reproducing Experiments
+### Reproducing Experiments
 
 Below, we describe the steps required for reproducing the experiments in the paper.
 Throughout, the main entry point for running experiments is the [`main.py`](./main.py) script.
 We also provide sample `slurm` scripts for launching pre-training and downstream fine-tuning experiments in the [`scripts/`](./scripts) directory.
 
 
-### Generate Arbitrary-Length Sequences
+#### Generate Arbitrary-Length Sequences
 
 To generate arbitrary-length sequences, set `mode=sample_eval`. Example scripts are provided in `scripts/var_len/var_len*.sh`. Here's an example script using BD3-LM:
-#### HuggingFace model
+##### HuggingFace model
 ```bash
 BLOCK_SIZE=4 # 4, 8, 16
 LENGTH=2048 # arbitrary; needs to be a multiple of the block size
@@ -110,7 +132,7 @@ python -u main.py \
     sampling.logdir=$PWD/sample_logs/samples_genlen_bd3lm_blocksize${BLOCK_SIZE}
 ```
 
-#### Local checkpoint
+##### Local checkpoint
 ```bash
 BLOCK_SIZE=4 # 4, 8, 16
 LENGTH=2048 # arbitrary; needs to be a multiple of the block size
@@ -132,7 +154,7 @@ python -u main.py \
     sampling.logdir=$PWD/sample_logs/samples_genlen_bd3lm_blocksize${BLOCK_SIZE}
 ```
 
-### Likelihood Evaluation 
+#### Likelihood Evaluation 
 To compute test perplexity, use `mode=ppl_eval`. Example scripts are provided in `scripts/ppl/eval_owt_*.sh`. Here's an example evaluation script on OpenWebText:
 ```bash
 BLOCK_SIZE=4 # 4, 8, 16
@@ -152,7 +174,7 @@ python -u main.py \
     mode=ppl_eval > logs/bd3lm_owt_block_size${BLOCK_SIZE}.log
 ```
 
-### Training Pipeline
+#### Training Pipeline
 To train BD3-LMs, use `mode=train` (default mode). Example scripts are provided in `scripts/train/train_owt*.sh`. Here's an example training script on OpenWebText:
 ```bash
 BLOCK_SIZE=4 # we recommend 4, 8, or 16. must be a factor of the context length
@@ -177,10 +199,10 @@ python -u main.py \
 ```
 The arguments `loader.batch_size` and `loader.eval_batch_size` allow you to control the batch size per GPU. If `loader.batch_size * num_gpus` is less than the global_batch_size, PyTorch Lightning will resort to gradient accumulation. You can also launch a training job on Slurm using the command: `sbatch scripts/train/train_owt_bd3lm.sh`.
 
-### Acknowledgements
+#### Acknowledgements
 This repository was built off of [MDLM](https://github.com/kuleshov-group/mdlm) and [SEDD](https://github.com/louaaron/Score-Entropy-Discrete-Diffusion).
 
-## Citation
+### Citation
 ```
 @inproceedings{
 arriola2025block,
